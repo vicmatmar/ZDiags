@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading;
 
 namespace ZDiags
 {
@@ -37,10 +37,26 @@ namespace ZDiags
             }
             Console.WriteLine("DUT COM Port: " + com_dut);
 
+            SerialUtils dutport = new SerialUtils(com_dut);
+
             set_all_relays(false);
             write_SingleDIO(Relays.DUT, true);
 
-            string outtxt = SerialUtils.WriteLine("root", com_dut);
+            DateTime start = DateTime.Now;
+            while(true)
+            {
+                string data = dutport.Data;
+                if (data != null && data.Contains("beaglebone login:"))
+                    break;
+                Thread.Sleep(5);
+
+                TimeSpan ts = DateTime.Now - start;
+                if (ts.TotalSeconds > 20)
+                {
+                    dutport.Dispose();
+                    throw new Exception("Timeout");
+                }
+            }
 
             return 0;
         }
