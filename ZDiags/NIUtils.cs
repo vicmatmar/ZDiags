@@ -11,14 +11,14 @@ namespace ZDiags
     {
         static public double Read_SingelAi(uint linenum)
         {
-            string ai_port_desc = get_PhysicalAIChannel(0);
+            string ai_port_desc = get_PhysicalAIChannel((int)linenum);
 
             using (Task analogReaderTask = new Task())
             {
                 //  Create channel and name it.
                 string linestr = string.Format("{0}", ai_port_desc);
                 string name = string.Format("ai{0}", linenum);
-                analogReaderTask.AIChannels.CreateVoltageChannel(linestr, name, AITerminalConfiguration.Differential, 0, 5, AIVoltageUnits.Volts);
+                analogReaderTask.AIChannels.CreateVoltageChannel(linestr, name, AITerminalConfiguration.Rse, 0, 5, AIVoltageUnits.Volts);
 
                 AnalogSingleChannelReader reader = new AnalogSingleChannelReader(analogReaderTask.Stream);
                 double value = reader.ReadSingleSample();

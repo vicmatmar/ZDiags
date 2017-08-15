@@ -99,7 +99,7 @@ namespace ZDiags
                 else
                 {
                     index = data.LastIndexOf(str);
-                    if (index > 0)
+                    if (index >= 0)
                     {
                         index = index + str.Length + 1;
                         break;
@@ -110,7 +110,7 @@ namespace ZDiags
                 TimeSpan ts = DateTime.Now - start;
                 if (ts.TotalSeconds > timeout_sec)
                 {
-                    string msg = string.Format("Timeout after {0} sec.  Waiting for {1}.\r\nData was: {2}",
+                    string msg = string.Format("Timeout after {0} sec.\r\nWait for: {1}.\r\nData was: {2}",
                         timeout_sec, str, data);
                     throw new Exception(msg);
                 }
@@ -128,12 +128,14 @@ namespace ZDiags
             {
                 _port.Close();
                 _port.Dispose();
+                _port = null;
             }
 
             if (_fs != null)
             {
                 _fs.Close();
                 _fs.Dispose();
+                _fs = null;
             }
         }
     }

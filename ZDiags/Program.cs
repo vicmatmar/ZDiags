@@ -22,9 +22,9 @@ namespace ZDiags
                 return -1;
             }
 
-            if (options.Com_dut != null)
+            if (options.COM_DUT != null)
             {
-                Properties.Settings.Default.COM_DUT = options.Com_dut;
+                Properties.Settings.Default.COM_DUT = options.COM_DUT;
                 Properties.Settings.Default.Save();
             }
 
@@ -41,6 +41,7 @@ namespace ZDiags
             {
                 Diags diags = new Diags(com_dut);
                 diags.Status_Event += Diags_Status_Event;
+                diags.Program_Radios = options.Program_Radios;
                 diags.Run();
             }
             catch(Exception ex)
@@ -58,22 +59,6 @@ namespace ZDiags
             string msg = string.Format("{0:G}: {1}", DateTime.Now, status_txt);
             Console.WriteLine(msg);
         }
-
-        static void set_all_relays(bool value)
-        {
-            Array relays= Enum.GetValues( typeof(Relays) );
-            foreach ( uint relay in relays)
-            {
-                NIUtils.Write_SingleDIO(relay, value);
-
-            }
-        }
-
-        static void write_SingleDIO(Relays relay, bool value)
-        {
-            NIUtils.Write_SingleDIO((uint)relay, value);
-        }
-
 
     }
 }

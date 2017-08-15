@@ -14,7 +14,12 @@ namespace ZDiags
 
         [Option("com_dut", Required = false,
             HelpText = "DUT Serial COM Port")]
-        public string Com_dut { get; set; }
+        public string COM_DUT { get; set; }
+
+
+        [Option("program_radios", Required = false, DefaultValue = true,
+            HelpText = "Executes the Program Radios command")]
+        public bool Program_Radios { get; set; }
 
     }
 }
