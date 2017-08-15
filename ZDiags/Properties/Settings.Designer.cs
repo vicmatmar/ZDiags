@@ -25,7 +25,7 @@ namespace ZDiags.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("com12")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string COM_DUT {
             get {
                 return ((string)(this["COM_DUT"]));

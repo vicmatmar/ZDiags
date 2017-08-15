@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 using System.IO;
 using System.IO.Ports;
-//using System.Text;
+using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace ZDiags
 {
-    class SerialUtils: IDisposable
+    class SerialUtils : IDisposable
     {
         SerialPort _port;
 
@@ -18,13 +19,12 @@ namespace ZDiags
         FileStream _fs;
 
         string _data;
-        public string Data {
-            get
-            {
-                return _data;
-            }
+        public string Data
+        {
+            get { return _data; }
+            set { _data = value; }
         }
-        
+
 
         public SerialUtils(string portName)
         {
@@ -53,41 +53,73 @@ namespace ZDiags
             _data += data;
 
             _fs.Write(Encoding.UTF8.GetBytes(data), 0, data.Length);
-            //_fs.FlushAsync();
-            _fs.Flush();
+            _fs.FlushAsync();
+            //_fs.Flush();
         }
 
-        public void Open()
+        public void WriteLine(string txt = "")
         {
-            if(!_port.IsOpen)
-                _port.Open();
+            _port.WriteLine(txt);
         }
 
-        public static string WriteLine(string txt, string portname)
+        /// <summary>
+        /// Waits for the a string in the serial data
+        /// </summary>
+        /// <param name="str">String to wait for</param>
+        /// <param name="timeout_sec">How long to wait in secs</param>
+        /// <param name="sample_ms">How often to look at the data</param>
+        /// <param name="startIndex">Where to start looking for</param>
+        /// <param name="clear_data">Clears all serial data</param>
+        /// <param name="isRegx">Whether to treat str as a regx</param>
+        /// <param name="regxopt">regulat exp options</param>
+        /// <returns>The position of the last occurance + the size of the string</returns>
+        public int WaitForStr(string str, int timeout_sec = 1, int sample_ms = 500, 
+            bool isRegx = false, RegexOptions regxopt= RegexOptions.Singleline, int startIndex = 0, bool clear_data = true)
         {
-            String buffer = String.Empty;
-
-            SerialPort port = new SerialPort(portname);
-
-            port.Open();
-            try
+            DateTime start = DateTime.Now;
+            int index = -1;
+            while (true)
             {
-                port.WriteLine(txt);
-
-                while (port.BytesToRead > 0)
+                string data = "";
+                try
                 {
-                    byte[] bytes = new byte[port.BytesToRead];
-                    port.Read(bytes, 0, bytes.Length);
-                    buffer += bytes;
+                    data = Data.Substring(startIndex);
+                }
+                catch (System.NullReferenceException) { }
 
+                if (isRegx)
+                {
+                    Match match = Regex.Match(Data, str, regxopt);
+                    if(match.Success)
+                    {
+                        index = match.Index + match.Length;
+                        break;
+                    }
+                }
+                else
+                {
+                    index = data.LastIndexOf(str);
+                    if (index > 0)
+                    {
+                        index = index + str.Length + 1;
+                        break;
+                    }
+                }
+                Thread.Sleep(sample_ms);
+
+                TimeSpan ts = DateTime.Now - start;
+                if (ts.TotalSeconds > timeout_sec)
+                {
+                    string msg = string.Format("Timeout after {0} sec.  Waiting for {1}.\r\nData was: {2}",
+                        timeout_sec, str, data);
+                    throw new Exception(msg);
                 }
             }
-            finally
-            {
-                port.Close();
-            }
 
-            return buffer;
+            if (clear_data)
+                Data = "";
+
+            return index;
         }
 
         public void Dispose()
@@ -98,7 +130,7 @@ namespace ZDiags
                 _port.Dispose();
             }
 
-            if(_fs != null)
+            if (_fs != null)
             {
                 _fs.Close();
                 _fs.Dispose();

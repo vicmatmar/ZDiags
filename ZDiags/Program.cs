@@ -37,28 +37,26 @@ namespace ZDiags
             }
             Console.WriteLine("DUT COM Port: " + com_dut);
 
-            SerialUtils dutport = new SerialUtils(com_dut);
-
-            set_all_relays(false);
-            write_SingleDIO(Relays.DUT, true);
-
-            DateTime start = DateTime.Now;
-            while(true)
+            try
             {
-                string data = dutport.Data;
-                if (data != null && data.Contains("beaglebone login:"))
-                    break;
-                Thread.Sleep(5);
-
-                TimeSpan ts = DateTime.Now - start;
-                if (ts.TotalSeconds > 20)
-                {
-                    dutport.Dispose();
-                    throw new Exception("Timeout");
-                }
+                Diags diags = new Diags(com_dut);
+                diags.Status_Event += Diags_Status_Event;
+                diags.Run();
+            }
+            catch(Exception ex)
+            {
+                Console.Write(ex.Message);
+                return -1;
             }
 
+
             return 0;
+        }
+
+        private static void Diags_Status_Event(object sender, string status_txt)
+        {
+            string msg = string.Format("{0:G}: {1}", DateTime.Now, status_txt);
+            Console.WriteLine(msg);
         }
 
         static void set_all_relays(bool value)

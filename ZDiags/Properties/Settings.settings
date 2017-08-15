@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="COM_DUT" Type="System.String" Scope="User">
-      <Value Profile="(Default)">com12</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="COM_BLE" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

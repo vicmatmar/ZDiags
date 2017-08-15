@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Diags.cs" />
     <Compile Include="NIUtils.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
