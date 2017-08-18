@@ -26,6 +26,9 @@ namespace ZDiags
         }
 
 
+        bool _isDisposed = false;
+        public bool IsDisposed { get { return _isDisposed; } }
+
         public SerialUtils(string portName)
         {
             _dat_log_loc = portName + ".txt";
@@ -122,6 +125,7 @@ namespace ZDiags
             return index;
         }
 
+
         public void Dispose()
         {
             if (_port != null)
@@ -137,6 +141,8 @@ namespace ZDiags
                 _fs.Dispose();
                 _fs = null;
             }
+
+            _isDisposed = true;
         }
     }
 }

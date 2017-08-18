@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace ZDiags
 {
@@ -14,7 +15,14 @@ namespace ZDiags
         enum Relays : uint { DUT = 0, BUTTON, BLE, USB2, USB1 };
         enum Sensors : uint { BUZZER_AUDIO = 0, GREEN_LIGHT, RED_LIGHT, YELLOW_LIGHT };
 
-        SerialUtils _dutport;
+        string _dutport_name, _bleport_name;
+        SerialUtils _dutport, _bleport;
+
+        public enum Customer { IRIS, Amazone };
+        Customer _custumer;
+
+        string _serialize_model = "IH200";
+        string _serialize_hw_version = "4";
 
         bool _program_radios = true;
         public bool Program_Radios { get { return _program_radios; } set { _program_radios = value; } }
@@ -26,9 +34,11 @@ namespace ZDiags
         public event StatusHandler Status_Event;
 
 
-        public Diags(string dut_port)
+        public Diags(string dut_port_name, string ble_port_name, Customer customer)
         {
-            _dutport = new SerialUtils(dut_port);
+            _dutport_name = dut_port_name;
+            _bleport_name = ble_port_name;
+            _custumer = customer;
         }
 
         void fire_status(string msg)
@@ -45,53 +55,54 @@ namespace ZDiags
 
             set_all_relays(false);
 
-            try
+            using (SerialUtils dutport = getDUTPort())
+            using (SerialUtils bleport = getBLEPort())
             {
+                // Trun BLE board so 
                 write_SingleDIO(Relays.BLE, true);
+                bleport.WaitForStr("U-Boot", 3);
+
+                // Trun DUT on
                 write_SingleDIO(Relays.DUT, true);
+                dutport.WaitForStr("U-Boot", 3);
 
                 // Login
-                fire_status("Wait for login...");
-                _dutport.WaitForStr("beaglebone login:", 20);
-                _dutport.WriteLine();
-                _dutport.WaitForStr("beaglebone login:", 3);
-                fire_status("Login");
-                _dutport.WriteLine("root");
-                _dutport.WaitForStr("Welcome root.*#", 3, isRegx: true);
+                fire_status("Login to DUT");
+                login(dutport);
 
                 // Program_Radios
-                if(Program_Radios)
+                if (Program_Radios)
                 {
                     fire_status("Program Radios");
                     DateTime t1 = DateTime.Now;
-                    _dutport.WriteLine("program_radios");
-                    _dutport.WaitForStr("Radio programming is complete.", Program_Radios_Timeout_Sec);
+                    dutport.WriteLine("program_radios");
+                    dutport.WaitForStr("Radio programming is complete.", Program_Radios_Timeout_Sec);
                     TimeSpan ts1 = DateTime.Now - t1;
                     fire_status("Radio programming is complete after " + ts1.TotalSeconds.ToString() + "sec");
                 }
 
                 // Diags
                 fire_status("Start diagnostics");
-                _dutport.WriteLine("diagnostics");
-                _dutport.WaitForStr("Press the reset button...", 3);
+                dutport.WriteLine("diagnostics");
+                dutport.WaitForStr("Press the reset button...", 3);
 
                 fire_status("Press the reset button...");
                 write_SingleDIO(Relays.BUTTON, true);
-                _dutport.WaitForStr(@"Insert both USB drives and attach increased load to usb0. Press <enter> when ready...", 10);
+                dutport.WaitForStr(@"Insert both USB drives and attach increased load to usb0. Press <enter> when ready...", 10);
                 fire_status("USB0 Test");
                 write_SingleDIO(Relays.USB1, true);
                 Thread.Sleep(500);
-                _dutport.WriteLine();
+                dutport.WriteLine();
 
-                _dutport.WaitForStr(@"Remove increased load from usb0 and attach load to usb1. Press <enter> when ready...", 5);
+                dutport.WaitForStr(@"Remove increased load from usb0 and attach load to usb1. Press <enter> when ready...", 5);
                 fire_status("USB1 Test");
                 write_SingleDIO(Relays.USB1, false);
                 write_SingleDIO(Relays.USB2, true);
                 Thread.Sleep(500);
-                _dutport.WriteLine();
+                dutport.WriteLine();
 
                 fire_status("Buzzer Test");
-                _dutport.WaitForStr("Buzzer on?", 3);
+                dutport.WaitForStr("Buzzer on?", 3);
                 double val = -1.0;
                 for (int i = 0; i < 5; i++)
                 {
@@ -103,94 +114,128 @@ namespace ZDiags
                 }
                 if (val > 3.0)
                 {
-                    _dutport.WriteLine("y");
+                    dutport.WriteLine("y");
                 }
                 else
                 {
-                    _dutport.WriteLine("n");
+                    dutport.WriteLine("n");
                     string emsg = string.Format("Unable to detect buzzer. Volatgae was: {0}", val.ToString("f2"));
                     throw new Exception(emsg);
                 }
 
 
                 fire_status("LED Tests");
+                led_test(Sensors.GREEN_LIGHT, 0.8, 1.2, "green");
+                led_test(Sensors.RED_LIGHT, 3.8, 4.5, "red");
+                led_test(Sensors.YELLOW_LIGHT, 2.8, 3.8, "yellow");
 
-                _dutport.WaitForStr("green led on?", 3);
-                val = -1.0;
-                double min_val = 0.8;
-                for (int i = 0; i < 5; i++)
-                {
-                    val = read_SingelAi(Sensors.GREEN_LIGHT);
-                    fire_status(string.Format("GREEN LED Voltage: {0}", val.ToString("f2")));
-                    if (val > min_val)
-                        break;
-                    Thread.Sleep(250);
-                }
-                if (val > min_val)
-                {
-                    _dutport.WriteLine("y");
-                }
-                else
-                {
-                    _dutport.WriteLine("n");
-                    string emsg = string.Format("Unable to detect GREEN LED. Volatgae was: {0}", val.ToString("f2"));
-                    throw new Exception(emsg);
-                }
-
-                _dutport.WaitForStr("red led on?", 3);
-                val = -1.0;
-                for (int i = 0; i < 5; i++)
-                {
-                    val = read_SingelAi(Sensors.RED_LIGHT);
-                    fire_status(string.Format("RED LED Voltage: {0}", val.ToString("f2")));
-                    if (val > min_val)
-                        break;
-                    Thread.Sleep(250);
-                }
-                if (val > min_val)
-                {
-                    _dutport.WriteLine("y");
-                }
-                else
-                {
-                    _dutport.WriteLine("n");
-                    string emsg = string.Format("Unable to detect RED LED. Volatgae was: {0}", val.ToString("f2"));
-                    throw new Exception(emsg);
-                }
-
-                _dutport.WaitForStr("yellow led on?", 3);
-                val = -1.0;
-                for (int i = 0; i < 5; i++)
-                {
-                    val = read_SingelAi(Sensors.YELLOW_LIGHT);
-                    fire_status(string.Format("YELLOW LED Voltage: {0}", val.ToString("f2")));
-                    if (val > min_val)
-                        break;
-                    Thread.Sleep(250);
-                }
-                if (val > min_val)
-                {
-                    _dutport.WriteLine("y");
-                }
-                else
-                {
-                    _dutport.WriteLine("n");
-                    string emsg = string.Format("Unable to detect YELLOW LED. Volatgae was: {0}", val.ToString("f2"));
-                    throw new Exception(emsg);
-                }
 
                 // Other tests
-                _dutport.WaitForStr("All Tests Passed", 20);
+                fire_status("Other Built-in Tests...");
+                dutport.WaitForStr("All Tests Passed", 20);
+                fire_status("All Tests Passed");
+
+                // BLE test
+                fire_status("BLE Test");
+                Random rand = new Random(DateTime.Now.Second);
+                int channel = rand.Next(0, 27);
+                fire_status("Login to BLE");
+                login(bleport);
+                bleport.WriteLine("ble_rx " + channel.ToString() + " 3000");
+                dutport.WriteLine("ble_tx " + channel.ToString());
+                bleport.WaitForStr("Packets received:", 5, clear_data: false);
+                string data = bleport.Data;
+                Match match = Regex.Match(data, @"Packets received: (\d*)", RegexOptions.Singleline);
+                if (!match.Success || match.Groups.Count < 2)
+                {
+                    string emsg = string.Format("Unable to get packets received from BLE master.\r\nData was: {0}", data);
+                    throw new Exception(emsg);
+                }
+                int packets_received = Convert.ToInt32(match.Groups[1].Value);
+                if (packets_received < 1500)
+                {
+                    string emsg = string.Format("BLE packets received < 1500.\r\nPackets received were: {0}", packets_received);
+                    throw new Exception(emsg);
+                }
+                string rmsg = string.Format("BLE packets received: {0}", packets_received);
 
 
-                TimeSpan ts = DateTime.Now - start_time;
-                string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
-                fire_status(tmsg);
             }
-            finally
+
+            fire_status("Serialize...");
+            Serialize();
+
+            TimeSpan ts = DateTime.Now - start_time;
+            string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
+            fire_status(tmsg);
+            set_all_relays(false);
+
+
+        }
+
+        public void Serialize()
+        {
+            using (SerialUtils port = getDUTPort())
             {
-                set_all_relays(false);
-                _dutport.Dispose();
+                port.WriteLine();
+                port.WaitForStr("#", 3);
+
+                MACAddrUtils macutil = new MACAddrUtils();
+                long mac = macutil.GetNewMac();
+
+                string macstr = MACAddrUtils.LongToStr(mac);
+
+                int batch_no = 1234567890;
+
+                string cmd = string.Format("serialize {0} model {1} customer {2} hw_version {3} batch_no {4}",
+                    macstr, _serialize_model, _custumer.ToString(), _serialize_hw_version, batch_no);
+                port.WriteLine(cmd);
+
+                port.WaitForStr("Device serialization is complete - please reboot", 5);
+            }
+
+        }
+
+        void login(SerialUtils port)
+        {
+            fire_status("Wait for login...");
+            port.WaitForStr("login:", 20);
+            port.WriteLine();
+            port.WaitForStr("login:", 3);
+            fire_status("Login");
+            port.WriteLine("root");
+            port.WaitForStr("IRIS MFG Shell.*#", 3, isRegx: true);
+
+        }
+
+        void led_test(Sensors sensor, double min_val, double max_val, string color)
+        {
+
+            _dutport.WaitForStr(color + " led on?", 3);
+            double val = -1.0;
+            for (int i = 0; i < 5; i++)
+            {
+                val = read_SingelAi(sensor);
+
+                string rmsg = string.Format(color + " led Voltage: {0}", val.ToString("f2"));
+                rmsg += string.Format(" ({0}-{1})", min_val.ToString("f1"), max_val.ToString("f1"));
+                fire_status(rmsg);
+
+                if (val >= min_val && val < max_val)
+                    break;
+
+                Thread.Sleep(250);
+            }
+
+            if (val >= min_val && val < max_val)
+            {
+                _dutport.WriteLine("y");
+            }
+            else
+            {
+                _dutport.WriteLine("n");
+                string emsg = string.Format("Unable to detect {0} led. Volatgae was: {1}", color, val.ToString("f2"));
+                throw new Exception(emsg);
             }
 
         }
@@ -215,6 +260,20 @@ namespace ZDiags
             return NIUtils.Read_SingelAi((uint)sensor);
         }
 
+        SerialUtils getDUTPort()
+        {
+            if (_dutport == null || _dutport.IsDisposed)
+                _dutport = new SerialUtils(_dutport_name);
+            return _dutport;
+        }
+        SerialUtils getBLEPort()
+        {
+            if (_bleport == null || _bleport.IsDisposed)
+                _bleport = new SerialUtils(_bleport_name);
+            return _bleport;
+        }
+
+
         public void Dispose()
         {
             if (_dutport != null)
@@ -222,6 +281,13 @@ namespace ZDiags
                 _dutport.Dispose();
                 _dutport = null;
             }
+
+            if (_bleport != null)
+            {
+                _bleport.Dispose();
+                _bleport = null;
+            }
+
         }
     }
 }
