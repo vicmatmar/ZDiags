@@ -17,7 +17,7 @@ namespace ZDiags
         public int Id { get; set; }
         public int mac_id { get; set; }
         public string smt_serial { get; set; }
-        public string hw_ver { get; set; }
+        public int hw_ver { get; set; }
         public int customer_id { get; set; }
         public System.DateTime date { get; set; }
     

@@ -16,7 +16,7 @@ namespace ZDiags
         enum Sensors : uint { BUZZER_AUDIO = 0, GREEN_LIGHT, RED_LIGHT, YELLOW_LIGHT };
 
         string _dutport_name, _bleport_name;
-        SerialUtils _dutport, _bleport;
+        SerialCOM _dutport, _bleport;
 
         string _smt_serial;
 
@@ -60,8 +60,8 @@ namespace ZDiags
 
             set_all_relays(false);
 
-            using (SerialUtils dutport = getDUTPort())
-            using (SerialUtils bleport = getBLEPort())
+            using (SerialCOM dutport = getDUTPort())
+            using (SerialCOM bleport = getBLEPort())
             {
                 // Trun BLE board so 
                 write_SingleDIO(Relays.BLE, true);
@@ -180,20 +180,29 @@ namespace ZDiags
 
         public void Serialize()
         {
+            
+
+            long lowes_serial = LowesSerial.GetSerial(
+                    model: LowesSerial.Model.IH200, 
+                    hw_version: (byte)_serialize_hw_version, 
+                    datetime: DateTime.Now, 
+                    factory: 7, 
+                    test_station: 1, 
+                    tester: 2);
+
             using (CLStoreEntities cx = new CLStoreEntities())
-            using (SerialUtils port = getDUTPort())
+            using (SerialCOM port = getDUTPort())
             {
                 //port.WriteLine();
                 //port.WaitForStr("#", 3);
+
+                int customer_id = cx.LowesCustomers.Where(c => c.Name == _custumer.ToString()).Single().Id;
 
                 // See if this board already had a mac assigned
                 long mac = MACAddrUtils.INVALID_MAC;
                 var hubs = cx.LowesHubs.Where(h => h.smt_serial == _smt_serial).OrderByDescending(h => h.date);
                 if (hubs.Any())
-                {
-                    var lhf = hubs.ToArray()[0];
-                    mac = lhf.MacAddress.MAC;
-                }
+                    mac = hubs.ToArray()[0].MacAddress.MAC;
                 if (mac == MACAddrUtils.INVALID_MAC)
                 {
                     MACAddrUtils macutil = new MACAddrUtils();
@@ -201,9 +210,10 @@ namespace ZDiags
                 }
                 int macid = MACAddrUtils.GetMacId(mac);
 
+                // Inser the 
                 LowesHub lh = new LowesHub();
-                lh.customer_id = 1;
-                lh.hw_ver = _serialize_hw_version.ToString();
+                lh.customer_id = customer_id;
+                lh.hw_ver = _serialize_hw_version;
                 lh.mac_id = macid;
                 lh.smt_serial = _smt_serial.ToString();
 
@@ -226,7 +236,7 @@ namespace ZDiags
 
         }
 
-        void login(SerialUtils port)
+        void login(SerialCOM port)
         {
             fire_status("Wait for login...");
             port.WaitForStr("login:", 20);
@@ -290,16 +300,16 @@ namespace ZDiags
             return NIUtils.Read_SingelAi((uint)sensor);
         }
 
-        SerialUtils getDUTPort()
+        SerialCOM getDUTPort()
         {
             if (_dutport == null || _dutport.IsDisposed)
-                _dutport = new SerialUtils(_dutport_name);
+                _dutport = new SerialCOM(_dutport_name);
             return _dutport;
         }
-        SerialUtils getBLEPort()
+        SerialCOM getBLEPort()
         {
             if (_bleport == null || _bleport.IsDisposed)
-                _bleport = new SerialUtils(_bleport_name);
+                _bleport = new SerialCOM(_bleport_name);
             return _bleport;
         }
 

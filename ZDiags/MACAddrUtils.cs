@@ -12,10 +12,12 @@ namespace ZDiags
     class MACAddrUtils
     {
 
+        // Next Lowes block: 00:16:A2:05:02:00 - 00:16:A2:05:FE:FF
+        // We may want to start at 0x0016A2050000 when we go live at Flex
         long _block_start_addr = 0x0016A2048100; //‭97207484672‬
         public long BlockStartAddr { get { return _block_start_addr; } set { _block_start_addr = value; } }
 
-        long _block_end_addr = 0x0016A204FF00;
+        long _block_end_addr = 0x0016A205FEFF;
         public long BlockEndAddr { get { return _block_end_addr; } set { _block_end_addr = value; } }
 
         public const long INVALID_MAC = 0;
@@ -28,15 +30,15 @@ namespace ZDiags
             using (CLStoreEntities context = new CLStoreEntities())
             {
                 ObjectParameter newmac = new ObjectParameter("newmac", typeof(long));
-                try
+                //try
                 {
                     context.GetNextMac(BlockStartAddr, BlockEndAddr, newmac);
                 }
-                catch (Exception ex)
-                {
-                    string msg = ex.InnerException.Message;
-                    msg += ex.InnerException.StackTrace;
-                }
+                //catch (Exception ex)
+                //{
+                //    string msg = ex.InnerException.Message;
+                //    msg += ex.InnerException.StackTrace;
+                //}
                 mac_out = (long)newmac.Value;
             }
 

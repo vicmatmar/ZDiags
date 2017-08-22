@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace ZDiags
 {
-    class SerialUtils : IDisposable
+    class SerialCOM : IDisposable
     {
         SerialPort _port;
 
@@ -29,7 +29,7 @@ namespace ZDiags
         bool _isDisposed = false;
         public bool IsDisposed { get { return _isDisposed; } }
 
-        public SerialUtils(string portName)
+        public SerialCOM(string portName)
         {
             _dat_log_loc = portName + ".txt";
             _fs = new FileStream(_dat_log_loc, FileMode.Create, FileAccess.Write, FileShare.Read);

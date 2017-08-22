@@ -84,6 +84,7 @@
     <Compile Include="LowesHub.cs">
       <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="LowesSerial.cs" />
     <Compile Include="MacAddress.cs">
       <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
@@ -97,7 +98,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="SerialUtils.cs" />
+    <Compile Include="SerialCOM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

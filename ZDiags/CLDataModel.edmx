@@ -19,7 +19,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="mac_id" Type="int" Nullable="false" />
           <Property Name="smt_serial" Type="nvarchar" MaxLength="10" Nullable="false" />
-          <Property Name="hw_ver" Type="nvarchar" MaxLength="1" Nullable="false" />
+          <Property Name="hw_ver" Type="int" Nullable="false" />
           <Property Name="customer_id" Type="int" Nullable="false" />
           <Property Name="date" Type="datetime" Nullable="false" StoreGeneratedPattern="Computed" />
         </EntityType>
@@ -110,7 +110,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="mac_id" Type="Int32" Nullable="false" />
           <Property Name="smt_serial" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
-          <Property Name="hw_ver" Type="String" Nullable="false" MaxLength="1" FixedLength="false" Unicode="true" />
+          <Property Name="hw_ver" Type="Int32" Nullable="false" />
           <Property Name="customer_id" Type="Int32" Nullable="false" />
           <Property Name="date" Type="DateTime" Nullable="false" Precision="3" annotation:StoreGeneratedPattern="Computed" />
           <NavigationProperty Name="LowesCustomer" Relationship="CLStoreModel.FK_LowesCustomersLowesHubs" FromRole="LowesHub" ToRole="LowesCustomer" />
