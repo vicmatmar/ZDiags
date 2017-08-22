@@ -12,19 +12,16 @@ namespace ZDiags
     using System;
     using System.Collections.Generic;
     
-    public partial class MacAddress
+    public partial class LowesHub
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public MacAddress()
-        {
-            this.LowesHubs = new HashSet<LowesHub>();
-        }
-    
         public int Id { get; set; }
-        public long MAC { get; set; }
-        public System.DateTime Date { get; set; }
+        public int mac_id { get; set; }
+        public string smt_serial { get; set; }
+        public string hw_ver { get; set; }
+        public int customer_id { get; set; }
+        public System.DateTime date { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<LowesHub> LowesHubs { get; set; }
+        public virtual LowesCustomer LowesCustomer { get; set; }
+        public virtual MacAddress MacAddress { get; set; }
     }
 }

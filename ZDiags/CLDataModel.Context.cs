@@ -15,10 +15,10 @@ namespace ZDiags
     using System.Data.Entity.Core.Objects;
     using System.Linq;
     
-    public partial class CentraliteEntities : DbContext
+    public partial class CLStoreEntities : DbContext
     {
-        public CentraliteEntities()
-            : base("name=CentraliteEntities")
+        public CLStoreEntities()
+            : base("name=CLStoreEntities")
         {
         }
     
@@ -27,6 +27,8 @@ namespace ZDiags
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<LowesCustomer> LowesCustomers { get; set; }
+        public virtual DbSet<LowesHub> LowesHubs { get; set; }
         public virtual DbSet<MacAddress> MacAddresses { get; set; }
     
         public virtual int GetNextMac(Nullable<long> startBlock, Nullable<long> endBlock, ObjectParameter newMac)

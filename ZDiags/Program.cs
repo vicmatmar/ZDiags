@@ -52,21 +52,25 @@ namespace ZDiags
             string com_ble = valuestr;
 
 
-            Diags.Customer custumer = Diags.Customer.IRIS; ;
+            Diags.Customer customer = Diags.Customer.IRIS; ;
             if (options.Custumer_Amazone)
-                custumer = Diags.Customer.Amazone;
-            Console.WriteLine("Custumer: " + custumer.ToString());
+                customer = Diags.Customer.Amazone;
+            Console.WriteLine("Custumer: " + customer.ToString());
 
 
             Console.WriteLine("Run Diags...");
             try
             {
-                using (Diags diags = new Diags(com_dut, com_ble, custumer))
+                using (
+                    Diags diags = new Diags(
+                        dut_port_name: com_dut, ble_port_name: com_ble,
+                        smt_serial: options.smt_serial, customer: customer, hw_version: options.HW_Version)
+                      )
                 {
                     diags.Status_Event += Diags_Status_Event;
                     diags.Program_Radios = options.Program_Radios;
 
-                    //diags.Serialize();
+                    diags.Serialize();
 
                     diags.Run();
                 }
@@ -75,6 +79,24 @@ namespace ZDiags
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
+
+                if(ex is System.Data.Entity.Validation.DbEntityValidationException)
+                {
+                    var exd = (System.Data.Entity.Validation.DbEntityValidationException)ex;
+                    foreach (var eves in exd.EntityValidationErrors)
+                    {
+                        Console.WriteLine(eves.Entry.Entity.ToString());
+                        foreach(var eve in eves.ValidationErrors)
+                            Console.WriteLine(eve.ErrorMessage);
+                    }
+                }
+                else if(ex is System.Data.Entity.Infrastructure.DbUpdateException)
+                {
+                    var exd = (System.Data.Entity.Infrastructure.DbUpdateException)ex;
+                    Console.WriteLine(exd.InnerException.InnerException.Message);
+
+
+                }
                 return -1;
             }
             Console.WriteLine("Diags Passed");

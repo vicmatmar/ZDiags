@@ -18,11 +18,13 @@ namespace ZDiags
         string _dutport_name, _bleport_name;
         SerialUtils _dutport, _bleport;
 
+        string _smt_serial;
+
         public enum Customer { IRIS, Amazone };
         Customer _custumer;
 
         string _serialize_model = "IH200";
-        string _serialize_hw_version = "4";
+        char _serialize_hw_version = '4';
 
         bool _program_radios = true;
         public bool Program_Radios { get { return _program_radios; } set { _program_radios = value; } }
@@ -34,11 +36,14 @@ namespace ZDiags
         public event StatusHandler Status_Event;
 
 
-        public Diags(string dut_port_name, string ble_port_name, Customer customer)
+        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version)
         {
             _dutport_name = dut_port_name;
             _bleport_name = ble_port_name;
+
+            _smt_serial = smt_serial;
             _custumer = customer;
+            _serialize_hw_version = hw_version;
         }
 
         void fire_status(string msg)
@@ -175,15 +180,40 @@ namespace ZDiags
 
         public void Serialize()
         {
+            using (CLStoreEntities cx = new CLStoreEntities())
             using (SerialUtils port = getDUTPort())
             {
-                port.WriteLine();
-                port.WaitForStr("#", 3);
+                //port.WriteLine();
+                //port.WaitForStr("#", 3);
 
-                MACAddrUtils macutil = new MACAddrUtils();
-                long mac = macutil.GetNewMac();
+                // See if this board already had a mac assigned
+                long mac = MACAddrUtils.INVALID_MAC;
+                var hubs = cx.LowesHubs.Where(h => h.smt_serial == _smt_serial).OrderByDescending(h => h.date);
+                if (hubs.Any())
+                {
+                    var lhf = hubs.ToArray()[0];
+                    mac = lhf.MacAddress.MAC;
+                }
+                if (mac == MACAddrUtils.INVALID_MAC)
+                {
+                    MACAddrUtils macutil = new MACAddrUtils();
+                    mac = macutil.GetNewMac();
+                }
+                int macid = MACAddrUtils.GetMacId(mac);
+
+                LowesHub lh = new LowesHub();
+                lh.customer_id = 1;
+                lh.hw_ver = _serialize_hw_version.ToString();
+                lh.mac_id = macid;
+                lh.smt_serial = _smt_serial.ToString();
+
+                cx.LowesHubs.Add(lh);
+                cx.SaveChanges();
 
                 string macstr = MACAddrUtils.LongToStr(mac);
+
+
+
 
                 int batch_no = 1234567890;
 

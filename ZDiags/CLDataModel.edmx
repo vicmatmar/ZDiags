@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="CLStoreModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="LowesCustomers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LowesHubs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="mac_id" Type="int" Nullable="false" />
+          <Property Name="smt_serial" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="hw_ver" Type="nvarchar" MaxLength="1" Nullable="false" />
+          <Property Name="customer_id" Type="int" Nullable="false" />
+          <Property Name="date" Type="datetime" Nullable="false" StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityType Name="MacAddress">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MAC" Type="bigint" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_LowesCustomersLowesHubs">
+          <End Role="LowesCustomers" Type="Self.LowesCustomers" Multiplicity="1" />
+          <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LowesCustomers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHubs">
+              <PropertyRef Name="customer_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LowesHubs_MacAddress">
+          <End Role="MacAddress" Type="Self.MacAddress" Multiplicity="1" />
+          <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MacAddress">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHubs">
+              <PropertyRef Name="mac_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="GetNextMac" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="StartBlock" Type="bigint" Mode="In" />
+          <Parameter Name="EndBlock" Type="bigint" Mode="In" />
+          <Parameter Name="NewMac" Type="bigint" Mode="InOut" />
+        </Function>
+        <EntityContainer Name="CLStoreModelStoreContainer">
+          <EntitySet Name="LowesCustomers" EntityType="Self.LowesCustomers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LowesHubs" EntityType="Self.LowesHubs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MacAddress" EntityType="Self.MacAddress" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_LowesCustomersLowesHubs" Association="Self.FK_LowesCustomersLowesHubs">
+            <End Role="LowesCustomers" EntitySet="LowesCustomers" />
+            <End Role="LowesHubs" EntitySet="LowesHubs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LowesHubs_MacAddress" Association="Self.FK_LowesHubs_MacAddress">
+            <End Role="MacAddress" EntitySet="MacAddress" />
+            <End Role="LowesHubs" EntitySet="LowesHubs" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CLStoreModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="CLStoreEntities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="GetNextMac">
+            <Parameter Name="StartBlock" Mode="In" Type="Int64" />
+            <Parameter Name="EndBlock" Mode="In" Type="Int64" />
+            <Parameter Name="NewMac" Mode="InOut" Type="Int64" />
+          </FunctionImport>
+          <EntitySet Name="LowesCustomers" EntityType="CLStoreModel.LowesCustomer" />
+          <EntitySet Name="LowesHubs" EntityType="CLStoreModel.LowesHub" />
+          <EntitySet Name="MacAddresses" EntityType="CLStoreModel.MacAddress" />
+          <AssociationSet Name="FK_LowesCustomersLowesHubs" Association="CLStoreModel.FK_LowesCustomersLowesHubs">
+            <End Role="LowesCustomer" EntitySet="LowesCustomers" />
+            <End Role="LowesHub" EntitySet="LowesHubs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LowesHubs_MacAddress" Association="CLStoreModel.FK_LowesHubs_MacAddress">
+            <End Role="MacAddress" EntitySet="MacAddresses" />
+            <End Role="LowesHub" EntitySet="LowesHubs" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="LowesCustomer">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="LowesHubs" Relationship="CLStoreModel.FK_LowesCustomersLowesHubs" FromRole="LowesCustomer" ToRole="LowesHub" />
+        </EntityType>
+        <EntityType Name="LowesHub">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="mac_id" Type="Int32" Nullable="false" />
+          <Property Name="smt_serial" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="hw_ver" Type="String" Nullable="false" MaxLength="1" FixedLength="false" Unicode="true" />
+          <Property Name="customer_id" Type="Int32" Nullable="false" />
+          <Property Name="date" Type="DateTime" Nullable="false" Precision="3" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="LowesCustomer" Relationship="CLStoreModel.FK_LowesCustomersLowesHubs" FromRole="LowesHub" ToRole="LowesCustomer" />
+          <NavigationProperty Name="MacAddress" Relationship="CLStoreModel.FK_LowesHubs_MacAddress" FromRole="LowesHub" ToRole="MacAddress" />
+        </EntityType>
+        <EntityType Name="MacAddress">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MAC" Type="Int64" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="LowesHubs" Relationship="CLStoreModel.FK_LowesHubs_MacAddress" FromRole="MacAddress" ToRole="LowesHub" />
+        </EntityType>
+        <Association Name="FK_LowesCustomersLowesHubs">
+          <End Type="CLStoreModel.LowesCustomer" Role="LowesCustomer" Multiplicity="1" />
+          <End Type="CLStoreModel.LowesHub" Role="LowesHub" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LowesCustomer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHub">
+              <PropertyRef Name="customer_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LowesHubs_MacAddress">
+          <End Type="CLStoreModel.MacAddress" Role="MacAddress" Multiplicity="1" />
+          <End Type="CLStoreModel.LowesHub" Role="LowesHub" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MacAddress">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHub">
+              <PropertyRef Name="mac_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="CLStoreModelStoreContainer" CdmEntityContainer="CLStoreEntities">
+          <FunctionImportMapping FunctionImportName="GetNextMac" FunctionName="CLStoreModel.Store.GetNextMac" />
+          <EntitySetMapping Name="LowesCustomers">
+            <EntityTypeMapping TypeName="CLStoreModel.LowesCustomer">
+              <MappingFragment StoreEntitySet="LowesCustomers">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LowesHubs">
+            <EntityTypeMapping TypeName="CLStoreModel.LowesHub">
+              <MappingFragment StoreEntitySet="LowesHubs">
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="customer_id" ColumnName="customer_id" />
+                <ScalarProperty Name="hw_ver" ColumnName="hw_ver" />
+                <ScalarProperty Name="smt_serial" ColumnName="smt_serial" />
+                <ScalarProperty Name="mac_id" ColumnName="mac_id" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MacAddresses">
+            <EntityTypeMapping TypeName="CLStoreModel.MacAddress">
+              <MappingFragment StoreEntitySet="MacAddress">
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="MAC" ColumnName="MAC" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

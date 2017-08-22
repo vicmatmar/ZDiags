@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="3d3373cf67324323a9ac2f392c1a03f9" Name="Diagram1">
+        <EntityTypeShape EntityType="CLStoreModel.LowesCustomer" Width="1.5" PointX="0.75" PointY="1.375" />
+        <EntityTypeShape EntityType="CLStoreModel.LowesHub" Width="1.5" PointX="3" PointY="1" />
+        <EntityTypeShape EntityType="CLStoreModel.MacAddress" Width="1.5" PointX="0.75" PointY="5.375" />
+        <AssociationConnector Association="CLStoreModel.FK_LowesCustomersLowesHubs" />
+        <AssociationConnector Association="CLStoreModel.FK_LowesHubs_MacAddress" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

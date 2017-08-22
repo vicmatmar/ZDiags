@@ -62,24 +62,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CentraliteDataModel.Context.cs">
+    <Compile Include="CLDataModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>CentraliteDataModel.Context.tt</DependentUpon>
+      <DependentUpon>CLDataModel.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="CentraliteDataModel.cs">
+    <Compile Include="CLDataModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>CentraliteDataModel.tt</DependentUpon>
+      <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="CentraliteDataModel.Designer.cs">
+    <Compile Include="CLDataModel.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>CentraliteDataModel.edmx</DependentUpon>
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Diags.cs" />
+    <Compile Include="LowesCustomer.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LowesHub.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="MacAddress.cs">
-      <DependentUpon>CentraliteDataModel.tt</DependentUpon>
+      <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="MACAddrUtils.cs" />
     <Compile Include="NIUtils.cs" />
@@ -95,12 +101,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EntityDeploy Include="CentraliteDataModel.edmx">
+    <EntityDeploy Include="CLDataModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>CentraliteDataModel.Designer.cs</LastGenOutput>
+      <LastGenOutput>CLDataModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="CentraliteDataModel.edmx.diagram">
-      <DependentUpon>CentraliteDataModel.edmx</DependentUpon>
+    <None Include="CLDataModel.edmx.diagram">
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -112,16 +118,19 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CentraliteDataModel.Context.tt">
+    <Content Include="CLDataModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>CentraliteDataModel.edmx</DependentUpon>
-      <LastGenOutput>CentraliteDataModel.Context.cs</LastGenOutput>
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
+      <LastGenOutput>CLDataModel.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="CentraliteDataModel.tt">
+    <Content Include="CLDataModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>CentraliteDataModel.edmx</DependentUpon>
-      <LastGenOutput>CentraliteDataModel.cs</LastGenOutput>
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
+      <LastGenOutput>CLDataModel.cs</LastGenOutput>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migration\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

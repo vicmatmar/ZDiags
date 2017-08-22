@@ -37,7 +37,7 @@ namespace ZDiags
 
         [Option("hw_version", Required = true,
             HelpText = "Board version")]
-        public string HW_Version { get; set; }
+        public char HW_Version { get; set; }
 
     }
 }

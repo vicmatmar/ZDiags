@@ -12,28 +12,30 @@ namespace ZDiags
     class MACAddrUtils
     {
 
-        long _block_start_addr = 0x0016A2048100;
+        long _block_start_addr = 0x0016A2048100; //‭97207484672‬
         public long BlockStartAddr { get { return _block_start_addr; } set { _block_start_addr = value; } }
 
         long _block_end_addr = 0x0016A204FF00;
         public long BlockEndAddr { get { return _block_end_addr; } set { _block_end_addr = value; } }
 
         public const long INVALID_MAC = 0;
+        public const int INVALID_ID = -1;
 
 
         public long GetNewMac()
         {
             long mac_out = INVALID_MAC;
-            using (CentraliteEntities context = new CentraliteEntities())
+            using (CLStoreEntities context = new CLStoreEntities())
             {
                 ObjectParameter newmac = new ObjectParameter("newmac", typeof(long));
                 try
                 {
                     context.GetNextMac(BlockStartAddr, BlockEndAddr, newmac);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    string msg = ex.Message;
+                    string msg = ex.InnerException.Message;
+                    msg += ex.InnerException.StackTrace;
                 }
                 mac_out = (long)newmac.Value;
             }
@@ -42,6 +44,26 @@ namespace ZDiags
                 throw new OverflowException("Unable to get a new MAC address");
 
             return mac_out;
+        }
+
+        public static int GetMacId(long mac)
+        {
+            int id = INVALID_ID;
+            using (CLStoreEntities cx = new CLStoreEntities())
+            {
+                var q = cx.MacAddresses.Where(m => m.MAC == mac);
+                if (q.Any())
+                {
+                    var ma = q.Single();
+                    id = ma.Id;
+                }
+
+            }
+
+            if (id == MACAddrUtils.INVALID_ID)
+                throw new Exception("Unable to find id for mac = " + mac.ToString());
+
+            return id;
         }
 
         public static string LongToStr(long value, string delimeter = ":")
@@ -59,7 +81,7 @@ namespace ZDiags
 
         public void DeleteBlock()
         {
-            using (CentraliteEntities context = new CentraliteEntities())
+            using (CLStoreEntities context = new CLStoreEntities())
             {
                 var addrs = context.MacAddresses.Where(m => m.MAC >= BlockStartAddr && m.MAC < BlockEndAddr);
                 context.MacAddresses.RemoveRange(addrs);
