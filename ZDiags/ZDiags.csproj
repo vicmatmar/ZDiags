@@ -99,6 +99,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SerialCOM.cs" />
+    <Compile Include="StationSite.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StationSiteId.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

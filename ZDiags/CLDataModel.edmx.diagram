@@ -6,11 +6,14 @@
     <edmx:Diagrams>
       <Diagram DiagramId="3d3373cf67324323a9ac2f392c1a03f9" Name="Diagram1">
         <EntityTypeShape EntityType="CLStoreModel.LowesCustomer" Width="1.5" PointX="0.75" PointY="1.375" />
-        <EntityTypeShape EntityType="CLStoreModel.LowesHub" Width="1.5" PointX="3" PointY="1" />
-        <EntityTypeShape EntityType="CLStoreModel.MacAddress" Width="1.5" PointX="0.75" PointY="5.375" />
+        <EntityTypeShape EntityType="CLStoreModel.LowesHub" Width="1.5" PointX="3.125" PointY="0.875" />
+        <EntityTypeShape EntityType="CLStoreModel.MacAddress" Width="1.5" PointX="0.75" PointY="3.75" />
         <AssociationConnector Association="CLStoreModel.FK_LowesCustomersLowesHubs" />
         <AssociationConnector Association="CLStoreModel.FK_LowesHubs_MacAddress" />
-      </Diagram>
+        <EntityTypeShape EntityType="CLStoreModel.StationSite" Width="1.5" PointX="5.875" PointY="1" />
+        <EntityTypeShape EntityType="CLStoreModel.StationSiteId" Width="1.5" PointX="8.125" PointY="1" />
+        <AssociationConnector Association="CLStoreModel.FK_StationMac_ToTable" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

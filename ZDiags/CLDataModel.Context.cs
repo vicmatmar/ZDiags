@@ -30,6 +30,8 @@ namespace ZDiags
         public virtual DbSet<LowesCustomer> LowesCustomers { get; set; }
         public virtual DbSet<LowesHub> LowesHubs { get; set; }
         public virtual DbSet<MacAddress> MacAddresses { get; set; }
+        public virtual DbSet<StationSite> StationSites { get; set; }
+        public virtual DbSet<StationSiteId> StationSiteIds { get; set; }
     
         public virtual int GetNextMac(Nullable<long> startBlock, Nullable<long> endBlock, ObjectParameter newMac)
         {

@@ -8,5 +8,11 @@
     <Setting Name="COM_BLE" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="MAC_Block_Start" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">97207484672</Value>
+    </Setting>
+    <Setting Name="MAC_Block_End" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">97207582463</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

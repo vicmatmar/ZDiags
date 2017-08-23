@@ -46,5 +46,29 @@ namespace ZDiags.Properties {
                 this["COM_BLE"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("97207484672")]
+        public long MAC_Block_Start {
+            get {
+                return ((long)(this["MAC_Block_Start"]));
+            }
+            set {
+                this["MAC_Block_Start"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("97207582463")]
+        public long MAC_Block_End {
+            get {
+                return ((long)(this["MAC_Block_End"]));
+            }
+            set {
+                this["MAC_Block_End"] = value;
+            }
+        }
     }
 }

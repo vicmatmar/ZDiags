@@ -31,6 +31,20 @@
           <Property Name="MAC" Type="bigint" Nullable="false" />
           <Property Name="Date" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="StationSite">
+          <Key>
+            <PropertyRef Name="StationMac" />
+          </Key>
+          <Property Name="StationMac" Type="char" MaxLength="12" Nullable="false" />
+          <Property Name="ProductionSiteId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StationSiteId">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StationMac" Type="char" MaxLength="12" Nullable="false" />
+        </EntityType>
         <Association Name="FK_LowesCustomersLowesHubs">
           <End Role="LowesCustomers" Type="Self.LowesCustomers" Multiplicity="1" />
           <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
@@ -55,6 +69,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_StationMac_ToTable">
+          <End Role="StationSite" Type="Self.StationSite" Multiplicity="1" />
+          <End Role="StationSiteId" Type="Self.StationSiteId" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StationSite">
+              <PropertyRef Name="StationMac" />
+            </Principal>
+            <Dependent Role="StationSiteId">
+              <PropertyRef Name="StationMac" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="GetNextMac" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="StartBlock" Type="bigint" Mode="In" />
           <Parameter Name="EndBlock" Type="bigint" Mode="In" />
@@ -64,6 +90,8 @@
           <EntitySet Name="LowesCustomers" EntityType="Self.LowesCustomers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LowesHubs" EntityType="Self.LowesHubs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MacAddress" EntityType="Self.MacAddress" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StationSite" EntityType="Self.StationSite" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StationSiteId" EntityType="Self.StationSiteId" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_LowesCustomersLowesHubs" Association="Self.FK_LowesCustomersLowesHubs">
             <End Role="LowesCustomers" EntitySet="LowesCustomers" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
@@ -71,6 +99,10 @@
           <AssociationSet Name="FK_LowesHubs_MacAddress" Association="Self.FK_LowesHubs_MacAddress">
             <End Role="MacAddress" EntitySet="MacAddress" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StationMac_ToTable" Association="Self.FK_StationMac_ToTable">
+            <End Role="StationSite" EntitySet="StationSite" />
+            <End Role="StationSiteId" EntitySet="StationSiteId" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -93,6 +125,12 @@
           <AssociationSet Name="FK_LowesHubs_MacAddress" Association="CLStoreModel.FK_LowesHubs_MacAddress">
             <End Role="MacAddress" EntitySet="MacAddresses" />
             <End Role="LowesHub" EntitySet="LowesHubs" />
+          </AssociationSet>
+          <EntitySet Name="StationSites" EntityType="CLStoreModel.StationSite" />
+          <EntitySet Name="StationSiteIds" EntityType="CLStoreModel.StationSiteId" />
+          <AssociationSet Name="FK_StationMac_ToTable" Association="CLStoreModel.FK_StationMac_ToTable">
+            <End Role="StationSite" EntitySet="StationSites" />
+            <End Role="StationSiteId" EntitySet="StationSiteIds" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="LowesCustomer">
@@ -149,6 +187,34 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="StationSite">
+          <Key>
+            <PropertyRef Name="StationMac" />
+          </Key>
+          <Property Name="StationMac" Type="String" Nullable="false" MaxLength="12" FixedLength="true" Unicode="false" />
+          <Property Name="ProductionSiteId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="StationSiteIds" Relationship="CLStoreModel.FK_StationMac_ToTable" FromRole="StationSite" ToRole="StationSiteId" />
+        </EntityType>
+        <EntityType Name="StationSiteId">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StationMac" Type="String" Nullable="false" MaxLength="12" FixedLength="true" Unicode="false" />
+          <NavigationProperty Name="StationSite" Relationship="CLStoreModel.FK_StationMac_ToTable" FromRole="StationSiteId" ToRole="StationSite" />
+        </EntityType>
+        <Association Name="FK_StationMac_ToTable">
+          <End Type="CLStoreModel.StationSite" Role="StationSite" Multiplicity="1" />
+          <End Type="CLStoreModel.StationSiteId" Role="StationSiteId" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StationSite">
+              <PropertyRef Name="StationMac" />
+            </Principal>
+            <Dependent Role="StationSiteId">
+              <PropertyRef Name="StationMac" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -185,7 +251,23 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-  </EntityContainerMapping>
+          <EntitySetMapping Name="StationSites">
+            <EntityTypeMapping TypeName="CLStoreModel.StationSite">
+              <MappingFragment StoreEntitySet="StationSite">
+                <ScalarProperty Name="ProductionSiteId" ColumnName="ProductionSiteId" />
+                <ScalarProperty Name="StationMac" ColumnName="StationMac" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StationSiteIds">
+            <EntityTypeMapping TypeName="CLStoreModel.StationSiteId">
+              <MappingFragment StoreEntitySet="StationSiteId">
+                <ScalarProperty Name="StationMac" ColumnName="StationMac" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
 </Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->

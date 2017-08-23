@@ -19,6 +19,7 @@ namespace ZDiags
         SerialCOM _dutport, _bleport;
 
         string _smt_serial;
+        long _lowes_serial = long.MinValue;
 
         public enum Customer { IRIS, Amazone };
         Customer _custumer;
@@ -44,6 +45,9 @@ namespace ZDiags
             _smt_serial = smt_serial;
             _custumer = customer;
             _serialize_hw_version = hw_version;
+
+            MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Block_Start;
+            MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Block_End;
         }
 
         void fire_status(string msg)
@@ -180,19 +184,19 @@ namespace ZDiags
 
         public void Serialize()
         {
-            
-
-            long lowes_serial = LowesSerial.GetSerial(
-                    model: LowesSerial.Model.IH200, 
-                    hw_version: (byte)_serialize_hw_version, 
-                    datetime: DateTime.Now, 
-                    factory: 7, 
-                    test_station: 1, 
-                    tester: 2);
-
             using (CLStoreEntities cx = new CLStoreEntities())
             using (SerialCOM port = getDUTPort())
             {
+                int production_site_id = MACAddrUtils.ProductionSiteId();
+
+                long _lowes_serial = LowesSerial.GetSerial(
+                        model: LowesSerial.Model.IH200,
+                        hw_version: (byte)_serialize_hw_version,
+                        datetime: DateTime.Now,
+                        factory: (byte)production_site_id,
+                        test_station: 1,
+                        tester: 2);
+
                 //port.WriteLine();
                 //port.WaitForStr("#", 3);
 
@@ -200,21 +204,29 @@ namespace ZDiags
 
                 // See if this board already had a mac assigned
                 long mac = MACAddrUtils.INVALID_MAC;
-                var hubs = cx.LowesHubs.Where(h => h.smt_serial == _smt_serial).OrderByDescending(h => h.date);
-                if (hubs.Any())
-                    mac = hubs.ToArray()[0].MacAddress.MAC;
-                if (mac == MACAddrUtils.INVALID_MAC)
+                var hubsq = cx.LowesHubs.Where(h => h.smt_serial == _smt_serial).OrderByDescending(h => h.date);
+                if (hubsq.Any())
                 {
-                    MACAddrUtils macutil = new MACAddrUtils();
-                    mac = macutil.GetNewMac();
+                    var hubs = hubsq.ToArray();
+                    foreach (LowesHub hub in hubs)
+                    {
+                        long hubmac = hub.MacAddress.MAC;
+                        if (MACAddrUtils.Inrange(hubmac))
+                        {
+                            mac = hubmac;
+                            break;
+                        }
+                    }
                 }
-                int macid = MACAddrUtils.GetMacId(mac);
+                if (mac == MACAddrUtils.INVALID_MAC)
+                    mac = MACAddrUtils.GetNewMac();
+                int mac_id = MACAddrUtils.GetMacId(mac);
 
                 // Inser the 
                 LowesHub lh = new LowesHub();
                 lh.customer_id = customer_id;
                 lh.hw_ver = _serialize_hw_version;
-                lh.mac_id = macid;
+                lh.mac_id = mac_id;
                 lh.smt_serial = _smt_serial.ToString();
 
                 cx.LowesHubs.Add(lh);
@@ -223,14 +235,11 @@ namespace ZDiags
                 string macstr = MACAddrUtils.LongToStr(mac);
 
 
-
-
-                int batch_no = 1234567890;
-
                 string cmd = string.Format("serialize {0} model {1} customer {2} hw_version {3} batch_no {4}",
-                    macstr, _serialize_model, _custumer.ToString(), _serialize_hw_version, batch_no);
-                port.WriteLine(cmd);
+                    macstr, _serialize_model, _custumer.ToString(), _serialize_hw_version, _lowes_serial);
 
+                fire_status(cmd);
+                port.WriteLine(cmd);
                 port.WaitForStr("Device serialization is complete - please reboot", 5);
             }
 
