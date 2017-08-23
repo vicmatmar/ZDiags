@@ -12,27 +12,27 @@
 USE [ManufacturingStore_v2]
 GO
 
-/****** Object:  Table [dbo].[StationSiteId]    Script Date: 8/23/2017 4:11:22 PM ******/
+/****** Object:  Table [dbo].[StationSite]    Script Date: 8/23/2017 4:11:10 PM ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[StationSiteId](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
+CREATE TABLE [dbo].[StationSite](
 	[StationMac] [char](12) NOT NULL,
-PRIMARY KEY CLUSTERED 
+	[ProductionSiteId] [int] NOT NULL,
+ CONSTRAINT [PK_StationSite] PRIMARY KEY CLUSTERED 
 (
-	[Id] ASC
+	[StationMac] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[StationSiteId]  WITH CHECK ADD  CONSTRAINT [FK_StationMac_ToTable] FOREIGN KEY([StationMac])
-REFERENCES [dbo].[StationSite] ([StationMac])
+ALTER TABLE [dbo].[StationSite]  WITH CHECK ADD  CONSTRAINT [FK_StationSite_ProductionSite] FOREIGN KEY([ProductionSiteId])
+REFERENCES [dbo].[ProductionSite] ([Id])
 GO
 
-ALTER TABLE [dbo].[StationSiteId] CHECK CONSTRAINT [FK_StationMac_ToTable]
+ALTER TABLE [dbo].[StationSite] CHECK CONSTRAINT [FK_StationSite_ProductionSite]
 GO
 
