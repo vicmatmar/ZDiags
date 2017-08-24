@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 using System.Threading;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace ZDiags
 {
-
     class Diags : IDisposable
     {
         enum Relays : uint { DUT = 0, BUTTON, BLE, USB2, USB1 };
@@ -41,6 +41,10 @@ namespace ZDiags
         const int _zwave_ver_major = 4;
         const int _zwave_ver_minor = 5;
 
+        const string _certificate_server = "172.24.32.6";
+
+        FileStream _fs_dut_data, _fs_ble_data;
+
 
         public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version)
         {
@@ -53,14 +57,14 @@ namespace ZDiags
 
             MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Block_Start;
             MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Block_End;
+
+            _fs_dut_data = new FileStream("log_dut_data.txt", FileMode.Create, FileAccess.Write, FileShare.Read);
+            _fs_ble_data = new FileStream("log_ble_data.txt", FileMode.Create, FileAccess.Write, FileShare.Read);
         }
 
         void fire_status(string msg)
         {
-            if (Status_Event != null)
-            {
-                Status_Event(this, msg);
-            }
+            Status_Event?.Invoke(this, msg);
         }
 
         public void Run()
@@ -111,12 +115,44 @@ namespace ZDiags
             fire_status("Serialize...");
             Serialize();
 
+            fire_status("Certificate...");
+            Certificate();
+
+            fire_status("Show Mfg...");
+            ShowMfg();
+
             TimeSpan ts = DateTime.Now - start_time;
             string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
             fire_status(tmsg);
             set_all_relays(false);
+        }
 
 
+        public void ShowMfg()
+        {
+            using (SerialCOM dutport = getDUTPort())
+            {
+                // Make sure we can talk to hub
+                dutport.WriteWait("", "#", 3);
+                dutport.Data = "";
+                dutport.WriteWait("show mfg", "Batch Number:", 3, clear_data:false);
+                fire_status(dutport.Data);
+            }
+        }
+
+        /// <summary>
+        /// Zeus certificate server: `172.24.32.6`
+        /// </summary>
+        public void Certificate()
+        {
+            using (SerialCOM dutport = getDUTPort())
+            {
+                // Make sure we can talk to hub
+                dutport.WriteWait("", "#", 3);
+
+                dutport.WriteWait("certificate " + _certificate_server, "Key install was successful", 15);
+                fire_status("Key install was successful");
+            }
         }
 
         public void ShowRadios()
@@ -153,7 +189,6 @@ namespace ZDiags
         /// </summary>
         public void ZWaveUpdate()
         {
-
             using (SerialCOM dutport = getDUTPort())
             {
                 // Make sure we can talk to hub
@@ -459,16 +494,38 @@ namespace ZDiags
         SerialCOM getDUTPort()
         {
             if (_dutport == null || _dutport.IsDisposed)
+            {
                 _dutport = new SerialCOM(_dutport_name);
+                _dutport.DataReceived += _dutport_DataReceived;
+            }
             return _dutport;
         }
+
+        private void _dutport_DataReceived(object sender, string data)
+        {
+            //byte[] edata = new UTF8Encoding(true).GetBytes(data);
+            byte[] edata = Encoding.UTF8.GetBytes(data);
+            _fs_dut_data.Write(edata, 0, edata.Length);
+            _fs_dut_data.Flush();
+        }
+
         SerialCOM getBLEPort()
         {
             if (_bleport == null || _bleport.IsDisposed)
+            {
                 _bleport = new SerialCOM(_bleport_name);
+                _bleport.DataReceived += _bleport_DataReceived;
+            }
             return _bleport;
         }
 
+        private void _bleport_DataReceived(object sender, string data)
+        {
+            //byte[] edata = new UTF8Encoding(true).GetBytes(data);
+            byte[] edata = Encoding.UTF8.GetBytes(data);
+            _fs_ble_data.Write(edata, 0, edata.Length);
+            _fs_ble_data.Flush();
+        }
 
         public void Dispose()
         {
@@ -482,6 +539,20 @@ namespace ZDiags
             {
                 _bleport.Dispose();
                 _bleport = null;
+            }
+
+            if (_fs_dut_data != null)
+            {
+                _fs_dut_data.Close();
+                _fs_dut_data.Dispose();
+                _fs_dut_data = null;
+            }
+
+            if (_fs_ble_data != null)
+            {
+                _fs_ble_data.Close();
+                _fs_ble_data.Dispose();
+                _fs_ble_data = null;
             }
 
         }

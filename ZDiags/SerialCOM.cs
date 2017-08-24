@@ -15,14 +15,20 @@ namespace ZDiags
     {
         SerialPort _port;
 
-        string _dat_log_loc;
-        FileStream _fs;
+        public delegate void StatusHandler(object sender, string data);
+        public event StatusHandler DataReceived;
 
-        string _data;
+        string _data = "";
         public string Data
         {
             get { return _data; }
-            set { _data = value; }
+            set
+            {
+                lock (_data)
+                {
+                    _data = value;
+                }
+            }
         }
 
         bool _isDisposed = false;
@@ -30,9 +36,6 @@ namespace ZDiags
 
         public SerialCOM(string portName)
         {
-            _dat_log_loc = portName + ".txt";
-            _fs = new FileStream(_dat_log_loc, FileMode.Create, FileAccess.Write, FileShare.Read);
-
             _port = new SerialPort()
             {
                 PortName = portName,
@@ -52,23 +55,23 @@ namespace ZDiags
             SerialPort sp = (SerialPort)sender;
 
             string data = sp.ReadExisting();
-            _data += data;
-
-            _fs.Write(Encoding.UTF8.GetBytes(data), 0, data.Length);
-            _fs.FlushAsync();
-            //_fs.Flush();
+            lock (_data)
+            {
+                _data += data;
+            }
+            DataReceived?.Invoke(this, data);
         }
 
-        public void WriteWait(string cmd, string exp, int timeout_sec = 1, bool isRegx=false, bool clear_data = false)
+        public void WriteWait(string cmd, string exp, int timeout_sec = 1, bool isRegx = false, bool clear_data = true)
         {
             WriteLine(cmd);
             try
             {
                 WaitFor(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
             }
-            catch(TimeoutException ex)
+            catch (TimeoutException ex)
             {
-                string msg = string.Format("Sent: {0}\r\n",cmd);
+                string msg = string.Format("Sent: {0}\r\n", cmd);
                 msg += ex.Message;
                 throw new TimeoutException(msg);
             }
@@ -90,8 +93,8 @@ namespace ZDiags
         /// <param name="isRegx">Whether to treat str as a regx</param>
         /// <param name="regxopt">regulat exp options</param>
         /// <returns>The position of the last occurance + the size of the string</returns>
-        public int WaitFor(string str, int timeout_sec = 1, int sample_ms = 500, 
-            bool isRegx = false, RegexOptions regxopt= RegexOptions.Singleline, int startIndex = 0, bool clear_data = true)
+        public int WaitFor(string str, int timeout_sec = 1, int sample_ms = 500,
+            bool isRegx = false, RegexOptions regxopt = RegexOptions.Singleline, int startIndex = 0, bool clear_data = true)
         {
             DateTime start = DateTime.Now;
             int index = -1;
@@ -107,7 +110,7 @@ namespace ZDiags
                 if (isRegx)
                 {
                     Match match = Regex.Match(Data, str, regxopt);
-                    if(match.Success)
+                    if (match.Success)
                     {
                         index = match.Index + match.Length;
                         break;
@@ -148,14 +151,6 @@ namespace ZDiags
                 _port.Dispose();
                 _port = null;
             }
-
-            if (_fs != null)
-            {
-                _fs.Close();
-                _fs.Dispose();
-                _fs = null;
-            }
-
             _isDisposed = true;
         }
     }
