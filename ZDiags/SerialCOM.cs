@@ -25,7 +25,6 @@ namespace ZDiags
             set { _data = value; }
         }
 
-
         bool _isDisposed = false;
         public bool IsDisposed { get { return _isDisposed; } }
 
@@ -58,6 +57,21 @@ namespace ZDiags
             _fs.Write(Encoding.UTF8.GetBytes(data), 0, data.Length);
             _fs.FlushAsync();
             //_fs.Flush();
+        }
+
+        public void WriteWait(string cmd, string exp, int timeout_sec = 1, bool isRegx=false, bool clear_data = false)
+        {
+            WriteLine(cmd);
+            try
+            {
+                WaitForStr(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
+            }
+            catch(TimeoutException ex)
+            {
+                string msg = string.Format("Sent: {0}\r\n",cmd);
+                msg += ex.Message;
+                throw new TimeoutException(msg);
+            }
         }
 
         public void WriteLine(string txt = "")
@@ -113,9 +127,9 @@ namespace ZDiags
                 TimeSpan ts = DateTime.Now - start;
                 if (ts.TotalSeconds > timeout_sec)
                 {
-                    string msg = string.Format("Timeout after {0} sec.\r\nWait for: {1}.\r\nData was: {2}",
+                    string msg = string.Format("Timeout after {0} sec.\r\nWait for: {1}\r\nData was: {2}",
                         timeout_sec, str, data);
-                    throw new Exception(msg);
+                    throw new TimeoutException(msg);
                 }
             }
 

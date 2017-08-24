@@ -19,7 +19,9 @@ namespace ZDiags
         SerialCOM _dutport, _bleport;
 
         string _smt_serial;
+
         long _lowes_serial = long.MinValue;
+        public long Lowes_Serial { get { return _lowes_serial; } }
 
         public enum Customer { IRIS, Amazone };
         Customer _custumer;
@@ -35,6 +37,9 @@ namespace ZDiags
 
         public delegate void StatusHandler(object sender, string status_txt);
         public event StatusHandler Status_Event;
+
+        const int _zwave_ver_major = 4;
+        const int _zwave_ver_minor = 5;
 
 
         public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version)
@@ -63,7 +68,6 @@ namespace ZDiags
             DateTime start_time = DateTime.Now;
 
             set_all_relays(false);
-
             using (SerialCOM dutport = getDUTPort())
             using (SerialCOM bleport = getBLEPort())
             {
@@ -89,6 +93,149 @@ namespace ZDiags
                     TimeSpan ts1 = DateTime.Now - t1;
                     fire_status("Radio programming is complete after " + ts1.TotalSeconds.ToString() + "sec");
                 }
+            }
+
+
+            fire_status("ZWave Update...");
+            ZWaveUpdate();
+
+            fire_status("Show Radios...");
+            ShowRadios();
+
+            fire_status("Diagnostics...");
+            Diagnostics();
+
+            fire_status("BLE Test...");
+            BLETest();
+
+            fire_status("Serialize...");
+            Serialize();
+
+            TimeSpan ts = DateTime.Now - start_time;
+            string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
+            fire_status(tmsg);
+            set_all_relays(false);
+
+
+        }
+
+        public void ShowRadios()
+        {
+            using (SerialCOM dutport = getDUTPort())
+            {
+                // Make sure we can talk to hub
+                dutport.WriteWait("", "#", 3);
+
+                dutport.WriteWait("show radios", "", timeout_sec: 5, clear_data: false);
+                string data = dutport.Data;
+                Match m = Regex.Match(data, @"Z-Wave (\d+\.\d+)", RegexOptions.Singleline);
+                if (m.Success && m.Groups.Count > 1)
+                {
+                    string verstr = m.Groups[1].Value;
+
+                    fire_status("Zwave Stack Version: " + verstr);
+                    bool needToUpdate = needsUpdate(verstr, _zwave_ver_major, _zwave_ver_minor);
+                    if (needToUpdate)
+                    {
+                        throw new Exception("Unexpected Zwave version: " + verstr);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Based on test spec:LOWESHUB-65830935-070716-0910-4
+        /// 
+        /// And from Edgar:
+        /// "Zwave_test" is needed to verify Zwave version is equal or higher to 4.05,  
+        /// if it is lower (all new components have lower version), 
+        /// then you have to send "zwave_flash -w /data/firmware/zwave-firmware.bin\n".
+        /// </summary>
+        public void ZWaveUpdate()
+        {
+
+            using (SerialCOM dutport = getDUTPort())
+            {
+                // Make sure we can talk to hub
+                dutport.WriteWait("", "#", 3);
+
+                enterShell(dutport);
+
+                try
+                {
+                    dutport.WriteWait("zwave_test -v", "Zwave Stack Version:", timeout_sec: 5, clear_data: false);
+                    string data = dutport.Data;
+                    Match m = Regex.Match(data, @"Z-Wave (\d+\.\d+)", RegexOptions.Singleline);
+                    if (m.Success && m.Groups.Count > 1)
+                    {
+                        string verstr = m.Groups[1].Value;
+                        fire_status("Zwave Stack Version: " + verstr);
+                        bool needToUpdate = needsUpdate(verstr, _zwave_ver_major, _zwave_ver_minor);
+                        if (needToUpdate)
+                        {
+                            fire_status("Zwave Updating...");
+                            dutport.WriteWait(
+                                "zwave_flash -w /data/firmware/zwave-firmware.bin",
+                                "Flash programming complete", 60);
+                            fire_status("Zwave Flash programming complete");
+
+                            dutport.WriteWait("zwave_default", "Zwave module has been factory defaulted", 3);
+                            fire_status("Zwave module has been factory defaulted");
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Unable to extract Z-Wave version info.\r\nData was: " + data);
+                    }
+                }
+                finally
+                {
+                    exitShell(dutport);
+                }
+            }
+        }
+
+        bool needsUpdate(string version_str, int exp_major, int exp_minor)
+        {
+            string[] vers = version_str.Split(new char[] { '.' });
+            int maj = Convert.ToInt32(vers[0]);
+            int min = 0;
+            if (vers.Count() > 1)
+                min = Convert.ToInt32(vers[1]);
+
+            bool needToUpdate = false;
+            if (maj < exp_major)
+                needToUpdate = true;
+            else if (maj == exp_major && min < exp_minor)
+                needToUpdate = true;
+
+            return needToUpdate;
+        }
+
+        void enterShell(SerialCOM port)
+        {
+            // Enter debug
+            port.WriteWait("debug", "debug>", 3);
+            // Enter Shelf
+            port.WriteWait("sh", "#", 3);
+        }
+
+        void exitShell(SerialCOM port)
+        {
+            // Exit shell
+            port.WriteWait("exit", "debug>", 3);
+            // Exit debug
+            port.WriteWait("exit", "#", 3);
+
+        }
+
+        public void Diagnostics()
+        {
+            using (SerialCOM dutport = getDUTPort())
+            {
+                // Make sure we can talk to hub
+                dutport.WriteLine();
+                dutport.WaitForStr("#", 3);
 
                 // Diags
                 fire_status("Start diagnostics");
@@ -143,9 +290,18 @@ namespace ZDiags
                 fire_status("Other Built-in Tests...");
                 dutport.WaitForStr("All Tests Passed", 20);
                 fire_status("All Tests Passed");
+            }
+        }
 
-                // BLE test
-                fire_status("BLE Test");
+        public void BLETest()
+        {
+            using (SerialCOM dutport = getDUTPort())
+            using (SerialCOM bleport = getBLEPort())
+            {
+                // Make sure we can talk to hubs
+                dutport.WriteLine();
+                dutport.WaitForStr("#", 3);
+
                 Random rand = new Random(DateTime.Now.Second);
                 int channel = rand.Next(0, 27);
                 fire_status("Login to BLE");
@@ -167,19 +323,7 @@ namespace ZDiags
                     throw new Exception(emsg);
                 }
                 string rmsg = string.Format("BLE packets received: {0}", packets_received);
-
-
             }
-
-            fire_status("Serialize...");
-            Serialize();
-
-            TimeSpan ts = DateTime.Now - start_time;
-            string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
-            fire_status(tmsg);
-            set_all_relays(false);
-
-
         }
 
         public void Serialize()
@@ -187,18 +331,21 @@ namespace ZDiags
             using (CLStoreEntities cx = new CLStoreEntities())
             using (SerialCOM port = getDUTPort())
             {
+                // Gather info to serialize hub
                 int production_site_id = MACAddrUtils.ProductionSiteId();
+                int test_station_id = MACAddrUtils.StationSiteId();
 
-                long _lowes_serial = LowesSerial.GetSerial(
+                _lowes_serial = LowesSerial.GetSerial(
                         model: LowesSerial.Model.IH200,
                         hw_version: (byte)_serialize_hw_version,
                         datetime: DateTime.Now,
                         factory: (byte)production_site_id,
-                        test_station: 1,
+                        test_station: (byte)test_station_id,
                         tester: 2);
 
-                //port.WriteLine();
-                //port.WaitForStr("#", 3);
+                // Make sure we can talk to hub
+                port.WriteLine();
+                port.WaitForStr("#", 3);
 
                 int customer_id = cx.LowesCustomers.Where(c => c.Name == _custumer.ToString()).Single().Id;
 
@@ -241,6 +388,8 @@ namespace ZDiags
                 fire_status(cmd);
                 port.WriteLine(cmd);
                 port.WaitForStr("Device serialization is complete - please reboot", 5);
+                fire_status("Device serialization is complete.");
+
             }
 
         }

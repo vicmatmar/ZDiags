@@ -27,16 +27,18 @@ namespace ZDiags
                 return -1;
             }
 
+            Console.WriteLine("Parameters used:");
+
             string propname = "com_dut";
             save_property(propname, options.Com_DUT);
             string valuestr = Properties.Settings.Default[propname].ToString();
             if (valuestr == null || valuestr == string.Empty)
             {
                 Console.WriteLine(CommandLine.Text.HelpText.AutoBuild(options).ToString());
-                Console.WriteLine(propname + " not specified");
+                Console.WriteLine(propname.ToUpper() + " not specified");
                 return -1;
             }
-            Console.WriteLine(propname + ": " + valuestr);
+            Console.WriteLine(propname.ToUpper() + ": " + valuestr);
             string com_dut = valuestr;
 
             propname = "com_ble";
@@ -45,18 +47,19 @@ namespace ZDiags
             if (valuestr == null || valuestr == string.Empty)
             {
                 Console.WriteLine(CommandLine.Text.HelpText.AutoBuild(options).ToString());
-                Console.WriteLine(propname + " not specified");
+                Console.WriteLine(propname.ToUpper() + " not specified");
                 return -1;
             }
-            Console.WriteLine(propname + ": " + valuestr);
+            Console.WriteLine(propname.ToUpper() + ": " + valuestr);
             string com_ble = valuestr;
 
-
+            Console.WriteLine("SMT Serial: " + options.smt_serial);
             Diags.Customer customer = Diags.Customer.IRIS; ;
             if (options.Custumer_Amazone)
                 customer = Diags.Customer.Amazone;
             Console.WriteLine("Custumer: " + customer.ToString());
-
+            Console.WriteLine("HW Version: " + options.HW_Version);
+            Console.WriteLine();
 
             Console.WriteLine("Run Diags...");
             try
@@ -70,14 +73,16 @@ namespace ZDiags
                     diags.Status_Event += Diags_Status_Event;
                     diags.Program_Radios = options.Program_Radios;
 
-                    diags.Serialize();
+                    //diags.Serialize();
 
                     diags.Run();
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine();
                 Console.WriteLine(ex.Message);
+                Console.WriteLine();
                 Console.WriteLine(ex.StackTrace);
 
                 if(ex is System.Data.Entity.Validation.DbEntityValidationException)
@@ -94,12 +99,11 @@ namespace ZDiags
                 {
                     var exd = (System.Data.Entity.Infrastructure.DbUpdateException)ex;
                     Console.WriteLine(exd.InnerException.InnerException.Message);
-
-
                 }
+
                 return -1;
             }
-            Console.WriteLine("Diags Passed");
+            Console.WriteLine("All Tests Passed");
 
             return 0;
         }
