@@ -64,7 +64,7 @@ namespace ZDiags
             WriteLine(cmd);
             try
             {
-                WaitForStr(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
+                WaitFor(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
             }
             catch(TimeoutException ex)
             {
@@ -90,7 +90,7 @@ namespace ZDiags
         /// <param name="isRegx">Whether to treat str as a regx</param>
         /// <param name="regxopt">regulat exp options</param>
         /// <returns>The position of the last occurance + the size of the string</returns>
-        public int WaitForStr(string str, int timeout_sec = 1, int sample_ms = 500, 
+        public int WaitFor(string str, int timeout_sec = 1, int sample_ms = 500, 
             bool isRegx = false, RegexOptions regxopt= RegexOptions.Singleline, int startIndex = 0, bool clear_data = true)
         {
             DateTime start = DateTime.Now;

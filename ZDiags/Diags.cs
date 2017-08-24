@@ -73,11 +73,11 @@ namespace ZDiags
             {
                 // Trun BLE board so 
                 write_SingleDIO(Relays.BLE, true);
-                bleport.WaitForStr("U-Boot", 3);
+                bleport.WaitFor("U-Boot", 3);
 
                 // Trun DUT on
                 write_SingleDIO(Relays.DUT, true);
-                dutport.WaitForStr("U-Boot", 3);
+                dutport.WaitFor("U-Boot", 3);
 
                 // Login
                 fire_status("Login to DUT");
@@ -89,7 +89,7 @@ namespace ZDiags
                     fire_status("Program Radios");
                     DateTime t1 = DateTime.Now;
                     dutport.WriteLine("program_radios");
-                    dutport.WaitForStr("Radio programming is complete.", Program_Radios_Timeout_Sec);
+                    dutport.WaitFor("Radio programming is complete.", Program_Radios_Timeout_Sec);
                     TimeSpan ts1 = DateTime.Now - t1;
                     fire_status("Radio programming is complete after " + ts1.TotalSeconds.ToString() + "sec");
                 }
@@ -234,23 +234,21 @@ namespace ZDiags
             using (SerialCOM dutport = getDUTPort())
             {
                 // Make sure we can talk to hub
-                dutport.WriteLine();
-                dutport.WaitForStr("#", 3);
+                dutport.WriteWait("", "#", 3);
 
                 // Diags
                 fire_status("Start diagnostics");
-                dutport.WriteLine("diagnostics");
-                dutport.WaitForStr("Press the reset button...", 3);
+                dutport.WriteWait("diagnostics", "Press the reset button...", 3);
 
                 fire_status("Press the reset button...");
                 write_SingleDIO(Relays.BUTTON, true);
-                dutport.WaitForStr(@"Insert both USB drives and attach increased load to usb0. Press <enter> when ready...", 10);
+                dutport.WaitFor(@"Insert both USB drives and attach increased load to usb0. Press <enter> when ready...", 10);
                 fire_status("USB0 Test");
                 write_SingleDIO(Relays.USB1, true);
                 Thread.Sleep(500);
                 dutport.WriteLine();
 
-                dutport.WaitForStr(@"Remove increased load from usb0 and attach load to usb1. Press <enter> when ready...", 5);
+                dutport.WaitFor(@"Remove increased load from usb0 and attach load to usb1. Press <enter> when ready...", 5);
                 fire_status("USB1 Test");
                 write_SingleDIO(Relays.USB1, false);
                 write_SingleDIO(Relays.USB2, true);
@@ -258,7 +256,7 @@ namespace ZDiags
                 dutport.WriteLine();
 
                 fire_status("Buzzer Test");
-                dutport.WaitForStr("Buzzer on?", 3);
+                dutport.WaitFor("Buzzer on?", 3);
                 double val = -1.0;
                 for (int i = 0; i < 5; i++)
                 {
@@ -288,7 +286,7 @@ namespace ZDiags
 
                 // Other tests
                 fire_status("Other Built-in Tests...");
-                dutport.WaitForStr("All Tests Passed", 20);
+                dutport.WaitFor("All Tests Passed", 20);
                 fire_status("All Tests Passed");
             }
         }
@@ -299,8 +297,7 @@ namespace ZDiags
             using (SerialCOM bleport = getBLEPort())
             {
                 // Make sure we can talk to hubs
-                dutport.WriteLine();
-                dutport.WaitForStr("#", 3);
+                dutport.WriteWait("", "#", 3);
 
                 Random rand = new Random(DateTime.Now.Second);
                 int channel = rand.Next(0, 27);
@@ -308,7 +305,7 @@ namespace ZDiags
                 login(bleport);
                 bleport.WriteLine("ble_rx " + channel.ToString() + " 3000");
                 dutport.WriteLine("ble_tx " + channel.ToString());
-                bleport.WaitForStr("Packets received:", 5, clear_data: false);
+                bleport.WaitFor("Packets received:", 5, clear_data: false);
                 string data = bleport.Data;
                 Match match = Regex.Match(data, @"Packets received: (\d*)", RegexOptions.Singleline);
                 if (!match.Success || match.Groups.Count < 2)
@@ -345,7 +342,7 @@ namespace ZDiags
 
                 // Make sure we can talk to hub
                 port.WriteLine();
-                port.WaitForStr("#", 3);
+                port.WaitFor("#", 3);
 
                 int customer_id = cx.LowesCustomers.Where(c => c.Name == _custumer.ToString()).Single().Id;
 
@@ -387,7 +384,7 @@ namespace ZDiags
 
                 fire_status(cmd);
                 port.WriteLine(cmd);
-                port.WaitForStr("Device serialization is complete - please reboot", 5);
+                port.WaitFor("Device serialization is complete - please reboot", 5);
                 fire_status("Device serialization is complete.");
 
             }
@@ -397,19 +394,20 @@ namespace ZDiags
         void login(SerialCOM port)
         {
             fire_status("Wait for login...");
-            port.WaitForStr("login:", 20);
-            port.WriteLine();
-            port.WaitForStr("login:", 3);
+
+            port.WaitFor("login:", 20);
+
+            port.WriteWait("", "login:", 3);
+
             fire_status("Login");
-            port.WriteLine("root");
-            port.WaitForStr("IRIS MFG Shell.*#", 3, isRegx: true);
+            port.WriteWait("root", "IRIS MFG Shell.*#", 3, isRegx: true);
 
         }
 
         void led_test(Sensors sensor, double min_val, double max_val, string color)
         {
 
-            _dutport.WaitForStr(color + " led on?", 3);
+            _dutport.WaitFor(color + " led on?", 3);
             double val = -1.0;
             for (int i = 0; i < 5; i++)
             {

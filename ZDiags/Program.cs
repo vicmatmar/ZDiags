@@ -61,7 +61,7 @@ namespace ZDiags
             Console.WriteLine("HW Version: " + options.HW_Version);
             Console.WriteLine();
 
-            Console.WriteLine("Run Diags...");
+            Console.WriteLine("Run Tests...");
             try
             {
                 using (
