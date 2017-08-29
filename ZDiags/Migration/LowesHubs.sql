@@ -1,4 +1,4 @@
-USE ManufacturingStore_v2
+﻿USE ManufacturingStore_v2
 GO
 
 CREATE TABLE [dbo].[LowesHubs] (
@@ -8,6 +8,7 @@ CREATE TABLE [dbo].[LowesHubs] (
     [hw_ver]      INT           NOT NULL,
     [customer_id] INT           NOT NULL,
     [date]        DATETIME      DEFAULT (getdate()) NOT NULL,
+    [lowes_serial] BIGINT NOT NULL, 
     CONSTRAINT [PK_LowesHubs] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_LowesCustomersLowesHubs] FOREIGN KEY ([customer_id]) REFERENCES [dbo].[LowesCustomers] ([Id]),
     CONSTRAINT [FK_LowesHubs_MacAddress] FOREIGN KEY ([mac_id]) REFERENCES [dbo].[MacAddress] ([Id])

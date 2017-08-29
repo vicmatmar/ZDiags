@@ -70,5 +70,17 @@ namespace ZDiags.Properties {
                 this["MAC_Block_End"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Logs")]
+        public string Log_Folder {
+            get {
+                return ((string)(this["Log_Folder"]));
+            }
+            set {
+                this["Log_Folder"] = value;
+            }
+        }
     }
 }

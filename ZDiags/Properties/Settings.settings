@@ -14,5 +14,8 @@
     <Setting Name="MAC_Block_End" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">97207582463</Value>
     </Setting>
+    <Setting Name="Log_Folder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Logs</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

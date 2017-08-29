@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
+using System.IO;
 
 namespace ZDiags
 {
@@ -70,6 +71,11 @@ namespace ZDiags
                         smt_serial: options.smt_serial, customer: customer, hw_version: options.HW_Version)
                       )
                 {
+
+                    
+                    diags.LogFolder = Properties.Settings.Default.Log_Folder;
+                    Directory.CreateDirectory(diags.LogFolder);
+
                     diags.Status_Event += Diags_Status_Event;
                     diags.Program_Radios = options.Program_Radios;
 

@@ -72,7 +72,7 @@ Example:
             shiftby -= 7;
             serial |= ((long)(test_station) << shiftby);
 
-            serial |= tester;
+            serial |= (long)tester;
 
             return serial;
         }

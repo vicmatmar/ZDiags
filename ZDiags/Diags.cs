@@ -20,7 +20,7 @@ namespace ZDiags
 
         string _smt_serial;
 
-        long _lowes_serial = long.MinValue;
+        long _lowes_serial = 0;
         public long Lowes_Serial { get { return _lowes_serial; } }
 
         public enum Customer { IRIS, Amazone };
@@ -34,6 +34,9 @@ namespace ZDiags
 
         int _program_radios_timeout_sec = 140;
         public int Program_Radios_Timeout_Sec { get { return _program_radios_timeout_sec; } set { _program_radios_timeout_sec = value; } }
+
+        string _log_folder = "";
+        public string LogFolder { get { return _log_folder; } set { _log_folder = value; } }
 
         public delegate void StatusHandler(object sender, string status_txt);
         public event StatusHandler Status_Event;
@@ -58,8 +61,6 @@ namespace ZDiags
             MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Block_Start;
             MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Block_End;
 
-            _fs_dut_data = new FileStream("log_dut_data.txt", FileMode.Create, FileAccess.Write, FileShare.Read);
-            _fs_ble_data = new FileStream("log_ble_data.txt", FileMode.Create, FileAccess.Write, FileShare.Read);
         }
 
         void fire_status(string msg)
@@ -70,6 +71,13 @@ namespace ZDiags
         public void Run()
         {
             DateTime start_time = DateTime.Now;
+
+            // Init the serial data log files
+            string fileloc = Path.Combine(LogFolder, "log_dut_data.txt");
+            _fs_dut_data = new FileStream(fileloc, FileMode.Create, FileAccess.Write, FileShare.Read);
+
+            fileloc = Path.Combine(LogFolder, "log_ble_data.txt");
+            _fs_ble_data = new FileStream(fileloc, FileMode.Create, FileAccess.Write, FileShare.Read);
 
             set_all_relays(false);
             using (SerialCOM dutport = getDUTPort())
@@ -135,8 +143,18 @@ namespace ZDiags
                 // Make sure we can talk to hub
                 dutport.WriteWait("", "#", 3);
                 dutport.Data = "";
-                dutport.WriteWait("show mfg", "Batch Number:", 3, clear_data:false);
-                fire_status(dutport.Data);
+                dutport.WriteWait("show mfg", "Batch Number:", 3, clear_data: false);
+
+                string mfg_data = dutport.Data;
+                fire_status(mfg_data);
+
+                string fileloc = Path.Combine(this.LogFolder, _smt_serial.ToString() + ".txt");
+                using (FileStream fs = new FileStream(fileloc, FileMode.Create, FileAccess.Write, FileShare.Read))
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.Write(mfg_data);
+                    sw.Close();
+                }
             }
         }
 
@@ -299,7 +317,7 @@ namespace ZDiags
                     fire_status(string.Format("Buzzer Voltage: {0}", val.ToString("f2")));
                     if (val > 3.0)
                         break;
-                    Thread.Sleep(100);
+                    Thread.Sleep(250);
                 }
                 if (val > 3.0)
                 {
@@ -401,12 +419,13 @@ namespace ZDiags
                     mac = MACAddrUtils.GetNewMac();
                 int mac_id = MACAddrUtils.GetMacId(mac);
 
-                // Inser the 
+                // Insert the hub
                 LowesHub lh = new LowesHub();
                 lh.customer_id = customer_id;
                 lh.hw_ver = _serialize_hw_version;
                 lh.mac_id = mac_id;
                 lh.smt_serial = _smt_serial.ToString();
+                lh.lowes_serial = Lowes_Serial;
 
                 cx.LowesHubs.Add(lh);
                 cx.SaveChanges();
@@ -415,7 +434,7 @@ namespace ZDiags
 
 
                 string cmd = string.Format("serialize {0} model {1} customer {2} hw_version {3} batch_no {4}",
-                    macstr, _serialize_model, _custumer.ToString(), _serialize_hw_version, _lowes_serial);
+                    macstr, _serialize_model, _custumer.ToString(), _serialize_hw_version, Lowes_Serial);
 
                 fire_status(cmd);
                 port.WriteLine(cmd);
@@ -504,7 +523,8 @@ namespace ZDiags
         private void _dutport_DataReceived(object sender, string data)
         {
             //byte[] edata = new UTF8Encoding(true).GetBytes(data);
-            byte[] edata = Encoding.UTF8.GetBytes(data);
+
+            byte[] edata = Encoding.Unicode.GetBytes(data);
             _fs_dut_data.Write(edata, 0, edata.Length);
             _fs_dut_data.Flush();
         }
