@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZDiags", "ZDiags\ZDiags.csproj", "{FC3180A5-EC3D-4ACE-BA2C-2883DFE117C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZBatt", "ZBatt\ZBatt.csproj", "{77C5B0F5-01FD-4BE7-81B2-D81A8DA9EB4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NIUtils", "NIUtils\NIUtils.csproj", "{68E541C8-A879-40DA-9C25-028D77B867DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{FC3180A5-EC3D-4ACE-BA2C-2883DFE117C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC3180A5-EC3D-4ACE-BA2C-2883DFE117C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC3180A5-EC3D-4ACE-BA2C-2883DFE117C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77C5B0F5-01FD-4BE7-81B2-D81A8DA9EB4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77C5B0F5-01FD-4BE7-81B2-D81A8DA9EB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77C5B0F5-01FD-4BE7-81B2-D81A8DA9EB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77C5B0F5-01FD-4BE7-81B2-D81A8DA9EB4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68E541C8-A879-40DA-9C25-028D77B867DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68E541C8-A879-40DA-9C25-028D77B867DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68E541C8-A879-40DA-9C25-028D77B867DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68E541C8-A879-40DA-9C25-028D77B867DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

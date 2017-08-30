@@ -496,7 +496,6 @@ namespace ZDiags
             foreach (uint relay in relays)
             {
                 NIUtils.Write_SingleDIO(relay, value);
-
             }
         }
 

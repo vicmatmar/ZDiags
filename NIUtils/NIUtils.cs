@@ -5,7 +5,7 @@ using System.Text;
 
 using NationalInstruments.DAQmx;
 
-namespace ZDiags
+namespace ZCommon
 {
     public class NIUtils
     {
@@ -45,8 +45,7 @@ namespace ZDiags
             }
 
         }
-
-        // Define other methods and classes here
+                
         static string get_PhysicalAIChannel(int index)
         {
             string[] data = DaqSystem.Local.GetPhysicalChannels(PhysicalChannelTypes.AI, PhysicalChannelAccess.External);
