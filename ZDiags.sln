@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZDiags", "ZDiags\ZDiags.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZBatt", "ZBatt\ZBatt.csproj", "{77C5B0F5-01FD-4BE7-81B2-D81A8DA9EB4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NIUtils", "NIUtils\NIUtils.csproj", "{68E541C8-A879-40DA-9C25-028D77B867DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZCommon", "ZCommon\ZCommon.csproj", "{68E541C8-A879-40DA-9C25-028D77B867DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

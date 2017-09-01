@@ -89,7 +89,6 @@
       <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="MACAddrUtils.cs" />
-    <Compile Include="NIUtils.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -142,6 +141,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migration\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZCommon\ZCommon.csproj">
+      <Project>{68e541c8-a879-40da-9c25-028d77b867df}</Project>
+      <Name>ZCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -11,7 +11,6 @@ namespace ZDiags
 {
     class Options
     {
-
         [Option("com_dut", Required = false, 
             HelpText = "DUT Serial COM Port")]
         public string Com_DUT { get; set; }

@@ -8,6 +8,8 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using System.IO;
 
+using ZCommon;
+
 namespace ZDiags
 {
     class Diags : IDisposable
@@ -84,10 +86,12 @@ namespace ZDiags
             using (SerialCOM bleport = getBLEPort())
             {
                 // Trun BLE board so 
+                fire_status("Power up BLE master");
                 write_SingleDIO(Relays.BLE, true);
                 bleport.WaitFor("U-Boot", 3);
 
                 // Trun DUT on
+                fire_status("Power up DUT");
                 write_SingleDIO(Relays.DUT, true);
                 dutport.WaitFor("U-Boot", 3);
 
@@ -178,9 +182,9 @@ namespace ZDiags
             using (SerialCOM dutport = getDUTPort())
             {
                 // Make sure we can talk to hub
-                dutport.WriteWait("", "#", 3);
+                dutport.WaitForPrompt();
 
-                dutport.WriteWait("show radios", "", timeout_sec: 5, clear_data: false);
+                dutport.WriteWait("show radios", "Zwave Stack Version", timeout_sec: 5, clear_data: false);
                 string data = dutport.Data;
                 Match m = Regex.Match(data, @"Z-Wave (\d+\.\d+)", RegexOptions.Singleline);
                 if (m.Success && m.Groups.Count > 1)
@@ -193,6 +197,10 @@ namespace ZDiags
                     {
                         throw new Exception("Unexpected Zwave version: " + verstr);
                     }
+                }
+                else
+                {
+                    throw new Exception("Unable to detect Zwave version.\r\nData was: " + data);
                 }
             }
         }
@@ -287,7 +295,8 @@ namespace ZDiags
             using (SerialCOM dutport = getDUTPort())
             {
                 // Make sure we can talk to hub
-                dutport.WriteWait("", "#", 3);
+                //dutport.WriteWait("", "#", 3, clear_data:false);
+                dutport.WaitForPrompt();
 
                 // Diags
                 fire_status("Start diagnostics");
@@ -373,6 +382,7 @@ namespace ZDiags
                     throw new Exception(emsg);
                 }
                 string rmsg = string.Format("BLE packets received: {0}", packets_received);
+                fire_status(rmsg);
             }
         }
 
