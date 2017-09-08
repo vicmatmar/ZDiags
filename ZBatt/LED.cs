@@ -27,22 +27,39 @@ namespace ZBatt
             _mid_val_point = (_on_val - _off_val) / 2 + off_val;
         }
 
-        public bool isOn()
+        double _last_value = double.MinValue;
+        public double LastValue
         {
-            double val = NIUtils.Read_SingelAi(_ai_linenum);
-            if (val > _mid_val_point)
-                return true;
-            else
-                return false;
+            get { return _last_value; }
         }
 
-        public bool isOff()
+        public double Value
         {
-            double val = NIUtils.Read_SingelAi(_ai_linenum);
-            if (val < _mid_val_point)
-                return true;
-            else
-                return false;
+            get { return NIUtils.Read_SingelAi(_ai_linenum); }
+        }
+
+        public bool isOn
+        {
+            get
+            {
+                _last_value = Value;
+                if (_last_value > _mid_val_point)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        public bool isOff
+        {
+            get
+            {
+                _last_value = Value;
+                if (_last_value < _mid_val_point)
+                    return true;
+                else
+                    return false;
+            }
         }
 
         public bool isBlicking(int timeout_sec = 1)
@@ -53,7 +70,7 @@ namespace ZBatt
             DateTime start = DateTime.Now;
             while (true)
             {
-                if (isOn())
+                if (isOn)
                     detected_high = true;
                 else
                     detected_low = true;

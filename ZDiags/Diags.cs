@@ -50,6 +50,8 @@ namespace ZDiags
 
         FileStream _fs_dut_data, _fs_ble_data;
 
+        bool _zwave_updated = false;
+
 
         public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version)
         {
@@ -115,8 +117,11 @@ namespace ZDiags
             fire_status("ZWave Update...");
             ZWaveUpdate();
 
-            fire_status("Show Radios...");
-            ShowRadios();
+            if (_zwave_updated)
+            {
+                fire_status("Show Radios...");
+                ShowRadios();
+            }
 
             fire_status("Diagnostics...");
             Diagnostics();
@@ -215,6 +220,7 @@ namespace ZDiags
         /// </summary>
         public void ZWaveUpdate()
         {
+            _zwave_updated = false;
             using (SerialCOM dutport = getDUTPort())
             {
                 // Make sure we can talk to hub
@@ -242,6 +248,8 @@ namespace ZDiags
 
                             dutport.WriteWait("zwave_default", "Zwave module has been factory defaulted", 3);
                             fire_status("Zwave module has been factory defaulted");
+
+                            _zwave_updated = true;
                         }
                     }
                     else
@@ -341,9 +349,13 @@ namespace ZDiags
 
 
                 fire_status("LED Tests");
-                led_test(Sensors.GREEN_LIGHT, 0.8, 1.2, "green");
-                led_test(Sensors.RED_LIGHT, 3.8, 4.5, "red");
-                led_test(Sensors.YELLOW_LIGHT, 2.8, 3.8, "yellow");
+                var p = Properties.Settings.Default;
+                led_test(Sensors.GREEN_LIGHT, p.LED_Green_Off_Val, p.LED_Green_On_Val, "green");
+                led_test(Sensors.RED_LIGHT, p.LED_Red_Off_Val, p.LED_Red_On_Val, "red");
+                led_test(Sensors.YELLOW_LIGHT, p.LED_Yellow_Off_Val, p.LED_Yellow_On_Val, "yellow");
+                //led_test(Sensors.GREEN_LIGHT, 0.8, 1.2, "green");
+                //led_test(Sensors.RED_LIGHT, 3.8, 4.5, "red");
+                //led_test(Sensors.YELLOW_LIGHT, 2.8, 3.8, "yellow");
 
 
                 // Other tests
@@ -459,7 +471,7 @@ namespace ZDiags
         {
             fire_status("Wait for login...");
 
-            port.WaitFor("login:", 20);
+            port.WaitFor("login:", 40);
 
             port.WriteWait("", "login:", 3);
 

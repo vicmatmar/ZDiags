@@ -107,6 +107,7 @@ namespace ZDiags
                     Console.WriteLine(exd.InnerException.InnerException.Message);
                 }
 
+
                 return -1;
             }
             Console.WriteLine("All Tests Passed");

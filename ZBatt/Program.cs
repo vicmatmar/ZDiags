@@ -43,6 +43,7 @@ using ZCommon;
 //# Remove jumper
 //reboot
 
+
 namespace ZBatt
 {
     class Program
@@ -51,14 +52,13 @@ namespace ZBatt
 
         enum Sensors : uint { RED_LIGHT = 0, GREEN_LIGHT, YELLOW_LIGHT };
 
-        LED _red_led;
-        LED _yellow_led;
-        LED _green_led;
-
         static SSHUtil _ssh;
 
         static int Main(string[] args)
         {
+            //Console.WriteLine("Press Enter to continue");
+            //Console.Read();
+
             var options = new Options();
             var parser_options = new CommandLine.ParserSettings { MutuallyExclusive = true };
             var parser = new CommandLine.Parser(parser_options);
@@ -69,8 +69,12 @@ namespace ZBatt
                 return -1;
             }
 
+
             try
             {
+                BatteryTest battery_test = new BatteryTest(options.Host);
+                battery_test.Status_Event += Battery_test_Status_Event;
+                battery_test.Run();
 
                 LED _red_led = new LED((uint)Sensors.RED_LIGHT, 0.25, 0.5);
                 LED _yellow_led = new LED((uint)Sensors.YELLOW_LIGHT, 0.01, 0.18);
@@ -127,6 +131,12 @@ namespace ZBatt
             return 0;
         }
 
+        private static void Battery_test_Status_Event(object sender, string status_txt)
+        {
+            string msg = string.Format("{0:G}: {1}", DateTime.Now, status_txt);
+            Console.WriteLine(msg);
+        }
+
         static void write_SingleDIO(Relays relay, bool value)
         {
             NIUtils.Write_SingleDIO((uint)relay, value);
@@ -145,34 +155,18 @@ namespace ZBatt
                 NIUtils.Write_SingleDIO(relay, value);
             }
         }
+
+        //# show battery
+
+        //Battery Information:
+        //Voltage:         1.10
+        //Maximum Voltage: 1.10
+        //Level:           -1.00
         static void verifyAlive()
         {
             _ssh.WriteLine("show battery");
             _ssh.WaitFor("Battery Information is not available", 10);
         }
 
-        //static void waitFor(string str, int timeout_sec = 3)
-        //{
-        //    string data = "";
-        //    DateTime start = DateTime.Now;
-        //    while (true)
-        //    {
-        //        data += _sr.ReadToEnd();
-        //        if (data.Contains(str))
-        //        {
-        //            break;
-        //        }
-        //        Thread.Sleep(250);
-
-        //        TimeSpan ts = DateTime.Now - start;
-        //        if (ts.TotalSeconds > timeout_sec)
-        //        {
-        //            string msg = string.Format("Timeout after {0} sec.\r\nWait for: {1}\r\nData was: {2}",
-        //                timeout_sec, str, data);
-        //            throw new TimeoutException(msg);
-        //        }
-
-        //    }
-        //}
     }
 }

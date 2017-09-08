@@ -54,6 +54,30 @@ namespace ZBatt
             _sr = new StreamReader(shellStream);
         }
 
+        public string ReadToEnd()
+        {
+            return _sr.ReadToEnd();
+        }
+
+        public string WriteWait(string cmd, string exp, int timeout_sec = 1, bool isRegx = false, bool clear_data = true)
+        {
+            WriteLine(cmd);
+            Thread.Sleep(150);
+            string data = "";
+            try
+            {
+                data = WaitFor(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
+            }
+            catch (TimeoutException ex)
+            {
+                string msg = string.Format("Sent: {0}\r\n", cmd);
+                msg += ex.Message;
+                throw new TimeoutException(msg);
+            }
+
+            return data;
+        }
+
         public void WriteLine(string txt)
         {
             _sw.WriteLine(txt);
@@ -69,8 +93,8 @@ namespace ZBatt
         /// <param name="clear_data">Clears all serial data</param>
         /// <param name="isRegx">Whether to treat str as a regx</param>
         /// <param name="regxopt">regulat exp options</param>
-        /// <returns>The position of the last occurance + the size of the string</returns>
-        public int WaitFor(string str, int timeout_sec = 1, int sample_ms = 500,
+        /// <returns>All data to this match</returns>
+        public string WaitFor(string str, int timeout_sec = 1, int sample_ms = 500,
             bool isRegx = false, RegexOptions regxopt = RegexOptions.Singleline, int startIndex = 0, bool clear_data = true)
         {
             DateTime start = DateTime.Now;
@@ -108,10 +132,11 @@ namespace ZBatt
                 }
             }
 
+            string data = Data;
             if (clear_data)
                 Data = "";
 
-            return index;
+            return data;
         }
 
         public void Dispose()

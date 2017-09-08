@@ -82,5 +82,77 @@ namespace ZDiags.Properties {
                 this["Log_Folder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
+        public double LED_Red_On_Val {
+            get {
+                return ((double)(this["LED_Red_On_Val"]));
+            }
+            set {
+                this["LED_Red_On_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.8")]
+        public double LED_Red_Off_Val {
+            get {
+                return ((double)(this["LED_Red_Off_Val"]));
+            }
+            set {
+                this["LED_Red_Off_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.8")]
+        public double LED_Yellow_On_Val {
+            get {
+                return ((double)(this["LED_Yellow_On_Val"]));
+            }
+            set {
+                this["LED_Yellow_On_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.8")]
+        public double LED_Yellow_Off_Val {
+            get {
+                return ((double)(this["LED_Yellow_Off_Val"]));
+            }
+            set {
+                this["LED_Yellow_Off_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2")]
+        public double LED_Green_On_Val {
+            get {
+                return ((double)(this["LED_Green_On_Val"]));
+            }
+            set {
+                this["LED_Green_On_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.8")]
+        public double LED_Green_Off_Val {
+            get {
+                return ((double)(this["LED_Green_Off_Val"]));
+            }
+            set {
+                this["LED_Green_Off_Val"] = value;
+            }
+        }
     }
 }

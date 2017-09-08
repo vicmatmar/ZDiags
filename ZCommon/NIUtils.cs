@@ -55,6 +55,8 @@ namespace ZCommon
         static string get_PhysicalDOPortChannel(int index)
         {
             string[] data = DaqSystem.Local.GetPhysicalChannels(PhysicalChannelTypes.DOPort, PhysicalChannelAccess.External);
+            if (data.Length == 0)
+                throw new Exception("NI box not detected");
             return data[index];
         }
     }

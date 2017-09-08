@@ -62,24 +62,6 @@ namespace ZDiags
             DataReceived?.Invoke(this, data);
         }
 
-        public void TryWriteWait(string cmd, string exp, int timeout_sec = 1, int try_count = 3, bool isRegx = false, bool clear_data = true)
-        {
-
-            for (int i = 0; i < try_count; i++)
-            {
-                try
-                {
-                    WriteWait(cmd, exp, timeout_sec, isRegx, clear_data);
-                    break;
-                }
-                catch(TimeoutException ex)
-                {
-                    if (i >= try_count)
-                        throw;
-                }
-            }
-        }
-
         public void WaitForPrompt(string prompt = "#")
         {
             for (int i = 0; i < 3; i++)
@@ -90,7 +72,7 @@ namespace ZDiags
                     break;
                 }
                 catch (TimeoutException) { }
-                WriteWait("", prompt, 3);
+                WriteWait("", prompt, 3, clear_data:false);
             }
 
         }
