@@ -69,54 +69,54 @@ namespace ZBatt
                 return -1;
             }
 
+            if (options.CalibrateLEDs)
+            {
+
+                BatteryTest batcal = new BatteryTest(options.Host);
+                double[] values = batcal.GetLEDsValues();
+                int i = 0;
+                Console.WriteLine("Red On   : {0}", values[i++].ToString("G2"));
+                Console.WriteLine("Green On : {0}", values[i++].ToString("G2"));
+                Console.WriteLine("Yellow On: {0}", values[i++].ToString("G2"));
+
+                Console.WriteLine();
+
+                Console.WriteLine("Red Off   : {0}", values[i++].ToString("G2"));
+                Console.WriteLine("Green Off : {0}", values[i++].ToString("G2"));
+                Console.WriteLine("Yellow Off: {0}", values[i++].ToString("G2"));
+
+                i = 0;
+                Properties.Settings.Default.LED_Red_On_Val = values[i++];
+                Properties.Settings.Default.LED_Green_On_Val = values[i++];
+                Properties.Settings.Default.LED_Yellow_On_Val = values[i++];
+
+                Properties.Settings.Default.LED_Red_Off_Val = values[i++];
+                Properties.Settings.Default.LED_Green_Off_Val = values[i++];
+                Properties.Settings.Default.LED_Yellow_Off_Val = values[i++];
+
+                Properties.Settings.Default.Save();
+
+            }
 
             try
             {
                 BatteryTest battery_test = new BatteryTest(options.Host);
                 battery_test.Status_Event += Battery_test_Status_Event;
+                battery_test.LEDTestEnabled = false;
+
+                if (!options.DisableLEDTest)
+                {
+                    battery_test.LEDTestEnabled = true;
+                    battery_test.LED_Red.OnVal = Properties.Settings.Default.LED_Red_On_Val;
+                    battery_test.LED_Red.OffVal = Properties.Settings.Default.LED_Red_Off_Val;
+                    battery_test.LED_Green.OnVal = Properties.Settings.Default.LED_Green_On_Val;
+                    battery_test.LED_Green.OffVal = Properties.Settings.Default.LED_Green_Off_Val;
+                    battery_test.LED_Yellow.OnVal = Properties.Settings.Default.LED_Yellow_On_Val;
+                    battery_test.LED_Yellow.OffVal = Properties.Settings.Default.LED_Yellow_Off_Val;
+                }
+
                 battery_test.Run();
 
-                LED _red_led = new LED((uint)Sensors.RED_LIGHT, 0.25, 0.5);
-                LED _yellow_led = new LED((uint)Sensors.YELLOW_LIGHT, 0.01, 0.18);
-                LED _green_led = new LED((uint)Sensors.GREEN_LIGHT, 0.001, 0.06);
-
-                using (_ssh = new SSHUtil(options.Host))
-                {
-                    set_all_relays(false);
-
-                    write_SingleDIO(Relays.DUT, true);
-                    write_SingleDIO(Relays.BATT, true);
-
-                    LED red_led = new LED((uint)Sensors.RED_LIGHT, 0.25, 0.5);
-                    bool isblink = red_led.isBlicking(3);
-                    while (red_led.isBlicking()) ;
-                    isblink = red_led.isBlicking();
-
-                    while (true)
-                    {
-                        double val = read_SingelAi(Sensors.RED_LIGHT);
-                        Console.WriteLine("{0}", val);
-                        val = read_SingelAi(Sensors.YELLOW_LIGHT);
-                        Console.WriteLine("{0}", val);
-                        val = read_SingelAi(Sensors.GREEN_LIGHT);
-                        Console.WriteLine("{0}", val);
-                        Console.WriteLine();
-                        Thread.Sleep(400);
-                    }
-
-
-
-                    write_SingleDIO(Relays.DUT, false);
-
-
-                    _ssh.Connect();
-
-                    verifyAlive();
-
-                    _ssh.WriteLine("show mfg");
-                    _ssh.WaitFor("Batch Number", 5, clear_data: false);
-                    Console.WriteLine(_ssh.Data);
-                }
 
             }
             catch (Exception ex)

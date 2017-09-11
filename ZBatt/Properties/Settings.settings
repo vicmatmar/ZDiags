@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ZBatt.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="LED_Red_On_Val" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.58</Value>
+    </Setting>
+    <Setting Name="LED_Green_On_Val" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.042</Value>
+    </Setting>
+    <Setting Name="LED_Yellow_On_Val" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.14</Value>
+    </Setting>
+    <Setting Name="LED_Red_Off_Val" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.27</Value>
+    </Setting>
+    <Setting Name="LED_Green_Off_Val" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.00098</Value>
+    </Setting>
+    <Setting Name="LED_Yellow_Off_Val" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.001</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
