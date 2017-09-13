@@ -39,6 +39,11 @@ namespace ZBatt
             _host = host;
         }
 
+        public bool IsConnected
+        {
+            get { return _sshclient.IsConnected; }
+        }
+
         public void Connect()
         {
             ConnectionInfo coninfo = new ConnectionInfo(_host, _user, new AuthenticationMethod[] {
@@ -59,14 +64,16 @@ namespace ZBatt
             return _sr.ReadToEnd();
         }
 
-        public string WriteWait(string cmd, string exp, int timeout_sec = 1, bool isRegx = false, bool clear_data = true)
+        public string WriteWait(string cmd, string exp, int timeout_sec = 1, 
+            bool isRegx = false, bool clear_data = true, RegexOptions regxopt = RegexOptions.Singleline)
         {
             WriteLine(cmd);
             Thread.Sleep(150);
             string data = "";
             try
             {
-                data = WaitFor(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
+                data = WaitFor(str: exp, timeout_sec: timeout_sec, 
+                    isRegx: isRegx, clear_data: clear_data, regxopt: regxopt);
             }
             catch (TimeoutException ex)
             {

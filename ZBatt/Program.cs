@@ -103,10 +103,9 @@ namespace ZBatt
                 battery_test.Status_Event += Battery_test_Status_Event;
                 battery_test.LEDTestEnabled = false;
 
-                if (!options.DisableLEDTest)
+                battery_test.LEDTestEnabled = !options.DisableLEDTest;
+                if (battery_test.LEDTestEnabled)
                 {
-                    battery_test.LEDTestEnabled = true;
-
                     battery_test.LED_Red.OnVal = Properties.Settings.Default.LED_Red_On_Val;
                     battery_test.LED_Red.OffVal = Properties.Settings.Default.LED_Red_Off_Val;
                     battery_test.LED_Green.OnVal = Properties.Settings.Default.LED_Green_On_Val;
@@ -114,6 +113,8 @@ namespace ZBatt
                     battery_test.LED_Yellow.OnVal = Properties.Settings.Default.LED_Yellow_On_Val;
                     battery_test.LED_Yellow.OffVal = Properties.Settings.Default.LED_Yellow_Off_Val;
                 }
+
+                battery_test.InvalidateEnabled = !options.DisableInvalidate;
 
                 battery_test.Run();
 

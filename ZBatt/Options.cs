@@ -24,9 +24,9 @@ namespace ZBatt
             HelpText = "Disables LED values")]
         public bool DisableLEDTest { get; set; }
 
-        [Option("disable_cleanup", Required = false, DefaultValue = false,
-            HelpText = "Disables running cleanup after test")]
-        public bool DisableCleanup { get; set; }
+        [Option("disable_invalidate", Required = false, DefaultValue = false,
+            HelpText = "Disables boot invalidation")]
+        public bool DisableInvalidate { get; set; }
 
     }
 

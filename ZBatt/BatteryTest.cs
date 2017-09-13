@@ -25,8 +25,8 @@ namespace ZBatt
         bool _led_test_enabled = false;
         public bool LEDTestEnabled { get { return _led_test_enabled; } set { _led_test_enabled = value; } }
 
-        bool _cleanup_enabled = false;
-        public bool CleanupEnabled { get { return _cleanup_enabled; } set { _cleanup_enabled = value; } }
+        bool _invalidate_enabled = false;
+        public bool InvalidateEnabled { get { return _invalidate_enabled; } set { _invalidate_enabled = value; } }
 
         string _host;
 
@@ -71,7 +71,7 @@ namespace ZBatt
             if (LEDTestEnabled)
             {
                 fire_status("LED Boot Test...");
-                LEDBootPatterTest();
+                LEDBootPatternTest();
             }
             TimeSpan ts_total = DateTime.Now - start;
             int ts_towait = 4000 - (int)ts_total.TotalSeconds * 1000;
@@ -120,6 +120,76 @@ namespace ZBatt
 
                 fire_status("DUT power back on");
                 BatteryJig.Write_SingleDIO(BatteryJig.Relays.DUT, true);
+                Thread.Sleep(500);
+                string data3 = ssh.WriteWait("show battery", "Level:", 3);
+                fire_status(data3);
+
+                if (InvalidateEnabled)
+                {
+                    fire_status("Clean up...");
+                    string data = cleanup(ssh);
+                    fire_status(data);
+
+                    fire_status("Invalidate...");
+
+                    //# boot invalidate
+                    //Current partition has been invalidated!
+
+                    fire_status("Reboot");
+                    ssh.WriteWait("reboot", "The system is going down for reboot NOW");
+                    BatteryJig.Write_SingleDIO(BatteryJig.Relays.BATT, false); // If batt is not off, we can't reboot (weird!)
+                    Thread.Sleep(5000);
+
+                    // Check for the boot LED pattern
+                    // then check it changes
+                    LEDBootPatternTest();
+                    start = DateTime.Now;
+                    while (true)
+                    {
+                        try
+                        {
+                            LEDBootPatternTest();
+                            Thread.Sleep(3000);
+                        }
+                        catch
+                        {
+                            break;
+                        }
+
+                        TimeSpan ts = DateTime.Now - start;
+                        if (ts.TotalSeconds > 15)
+                            throw new Exception("LED pattern did not changed");
+                    }
+
+                    LEDInvalidatedPatternTest();
+
+                    // Check our connection is fried
+                    if (ssh.IsConnected)
+                        throw new Exception("Our ssh is still connected. Are you sure the hub rebootted?");
+
+                    // Now try to connect
+                    // It should not let os
+                    try
+                    {
+                        ssh.Connect();
+                    }
+                    catch (Exception ex)
+                    {
+                        string emsg = ex.Message;
+                    }
+
+                    // To revert using chipserver
+                    //jumpered lowes hub
+                    //power up
+                    //root/a1
+                    //mount /dev/mmcblk0p5 /mnt
+                    //vi /mnt/bootindex
+                    //# Change to 5
+                    //sync
+                    //umount /mnt
+                    //# Remove jumper
+                    //reboot
+                }
 
             }
             catch
@@ -132,24 +202,40 @@ namespace ZBatt
             }
         }
 
-        void LEDBootPatterTest()
+        void LEDInvalidatedPatternTest()
         {
             DateTime start = DateTime.Now;
-            TimeSpan ts_total = DateTime.Now - start;
+            int detected_count = 0;
+            while (true)
+            {
+                if (_red_led.isOff && _yellow_led.isOn && _green_led.isOn)
+                {
+                    detected_count++;
+                    Thread.Sleep(250);
+
+                    if (detected_count > 5)
+                        break;
+                }
+                TimeSpan ts = DateTime.Now - start;
+                if (ts.TotalSeconds > 10)
+                {
+                    throw new Exception("LEDs invalidated pattern not detected");
+                }
+            }
+
+        }
+
+
+        void LEDBootPatternTest()
+        {
+            DateTime start = DateTime.Now;
             while (true)
             {
                 if (_red_led.isOn && _yellow_led.isOn && _green_led.isOn)
                 {
                     break;
                 }
-                else if (_red_led.isOn && _green_led.isOn)
-                {
-                    string emsg = string.Format("Y:{0}", _yellow_led.LastValue.ToString("G2"));
-                    //fire_status(emsg);
-
-                }
                 TimeSpan ts = DateTime.Now - start;
-                ts_total += ts;
                 if (ts.TotalSeconds > 5)
                 {
                     throw new Exception("Not all LEDs detected ON");
@@ -165,7 +251,6 @@ namespace ZBatt
                     break;
                 }
                 TimeSpan ts = DateTime.Now - start;
-                ts_total += ts;
                 if (ts.TotalSeconds > 10)
                 {
                     string emsg = string.Format("Not all LED detected OFF. R:{0} Y:{1} G:{2}",
@@ -176,7 +261,6 @@ namespace ZBatt
                 }
             }
             fire_status("LEDs detected OFF");
-
         }
 
         /// <summary>
@@ -243,9 +327,11 @@ namespace ZBatt
 
             ssh.Data = "";
 
-            enterShell(ssh);
+            enterShell(ssh, clear_data: false);
 
-            ssh.WriteWait(@"find /data/agent/ -type f -exec md5sum {} \; | sort -k 34 | md5sum", _ssh_prompt, 10, clear_data: false);
+            string cmds = @"find /data/agent/ -type f -exec md5sum {} \; | sort -k 34 | md5sum";
+
+            ssh.WriteWait(cmds, Regex.Escape(cmds) + ".*" + _ssh_prompt, 10, clear_data: false, isRegx: true);
 
             string[] cmd_list = new string[]
             {
@@ -257,34 +343,34 @@ namespace ZBatt
                 "rm -f /data/log/messages*",
                 "rm -f /data/log/dmesg*",
                 "rm -f /data/zwave_*",
-                "cat data/mfg_test_report.json",
+                "cat /data/mfg_test_report.json",
                 "rm -f /data/mfg_test_report.json",
                 "sync"
             };
-            foreach(string cmd in cmd_list)
+            foreach (string cmd in cmd_list)
             {
-                ssh.WriteWait(cmd, _ssh_prompt, clear_data:false);
+                ssh.WriteWait(cmd, Regex.Escape(cmd) + ".*" + _ssh_prompt, 5, clear_data: false, isRegx: true);
             }
 
-            exitShell(ssh);
+            exitShell(ssh, clear_data: false);
 
             return ssh.Data;
         }
 
-        static void enterShell(SSHUtil ssh)
+        static void enterShell(SSHUtil ssh, bool clear_data = true)
         {
             // Enter debug
-            ssh.WriteWait("debug", "debug>", 3);
+            ssh.WriteWait("debug", "debug>", 3, clear_data: clear_data);
             // Enter shell
-            ssh.WriteWait("sh", "#", 3);
+            ssh.WriteWait("sh", "#", 3, clear_data: clear_data);
         }
 
-        static void exitShell(SSHUtil ssh)
+        static void exitShell(SSHUtil ssh, bool clear_data = true)
         {
             // Exit shell
-            ssh.WriteWait("exit", "debug>", 3);
+            ssh.WriteWait("exit", "debug>", 3, clear_data: clear_data);
             // Exit debug
-            ssh.WriteWait("exit", "#", 3);
+            ssh.WriteWait("exit", "#", 3, clear_data: clear_data);
 
         }
 
