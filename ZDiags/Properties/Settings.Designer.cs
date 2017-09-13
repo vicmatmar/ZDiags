@@ -133,7 +133,7 @@ namespace ZDiags.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.7")]
         public double LED_Green_On_Val {
             get {
                 return ((double)(this["LED_Green_On_Val"]));

@@ -95,7 +95,6 @@ namespace ZBatt
                 Properties.Settings.Default.LED_Yellow_Off_Val = values[i++];
 
                 Properties.Settings.Default.Save();
-
             }
 
             try
@@ -107,6 +106,7 @@ namespace ZBatt
                 if (!options.DisableLEDTest)
                 {
                     battery_test.LEDTestEnabled = true;
+
                     battery_test.LED_Red.OnVal = Properties.Settings.Default.LED_Red_On_Val;
                     battery_test.LED_Red.OffVal = Properties.Settings.Default.LED_Red_Off_Val;
                     battery_test.LED_Green.OnVal = Properties.Settings.Default.LED_Green_On_Val;
@@ -127,6 +127,8 @@ namespace ZBatt
 
                 return -2;
             }
+
+            Console.WriteLine("All Tests Passed");
 
             return 0;
         }

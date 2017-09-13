@@ -24,6 +24,10 @@ namespace ZBatt
             HelpText = "Disables LED values")]
         public bool DisableLEDTest { get; set; }
 
+        [Option("disable_cleanup", Required = false, DefaultValue = false,
+            HelpText = "Disables running cleanup after test")]
+        public bool DisableCleanup { get; set; }
+
     }
 
 }

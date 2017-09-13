@@ -96,6 +96,7 @@ namespace ZDiags
                 fire_status("Power up DUT");
                 write_SingleDIO(Relays.DUT, true);
                 dutport.WaitFor("U-Boot", 3);
+                Thread.Sleep(3000);
 
                 // Login
                 fire_status("Login to DUT");
@@ -127,7 +128,23 @@ namespace ZDiags
             Diagnostics();
 
             fire_status("BLE Test...");
-            BLETest();
+            int trycount = 0;
+            while(true)
+            {
+                try
+                {
+                    BLETest();
+                    break;
+                }catch(Exception ex)
+                {
+                    string msg = ex.Message;
+                    if(!msg.Contains("BLE packets received"))
+                        throw;
+
+                    if (trycount++ > 3)
+                        throw;
+                }
+            }
 
             fire_status("Serialize...");
             Serialize();
@@ -328,13 +345,14 @@ namespace ZDiags
                 fire_status("Buzzer Test");
                 dutport.WaitFor("Buzzer on?", 3);
                 double val = -1.0;
+                double expval = 3.0;
                 for (int i = 0; i < 5; i++)
                 {
                     val = read_SingelAi(Sensors.BUZZER_AUDIO);
                     fire_status(string.Format("Buzzer Voltage: {0}", val.ToString("f2")));
-                    if (val > 3.0)
+                    if (val > expval)
                         break;
-                    Thread.Sleep(250);
+                    Thread.Sleep(500);
                 }
                 if (val > 3.0)
                 {
@@ -343,7 +361,8 @@ namespace ZDiags
                 else
                 {
                     dutport.WriteLine("n");
-                    string emsg = string.Format("Unable to detect buzzer. Volatgae was: {0}", val.ToString("f2"));
+                    string emsg = string.Format("Unable to detect buzzer. Volatgae was: {0}. Expected more than {1}",
+                        val.ToString("f2"), expval.ToString("f2"));
                     throw new Exception(emsg);
                 }
 
@@ -471,12 +490,24 @@ namespace ZDiags
         {
             fire_status("Wait for login...");
 
-            port.WaitFor("login:", 40);
+            //port.WaitFor("login:", 40);
 
-            port.WriteWait("", "login:", 3);
+            int trycount = 0;
+            while (true)
+            {
+                try
+                {
+                    port.WriteWait("", "login:", 5);
+                    break;
+                }catch(Exception ex)
+                {
+                    if (trycount++ > 3)
+                        throw;
+                }
+            }
 
             fire_status("Login");
-            port.WriteWait("root", "IRIS MFG Shell.*#", 3, isRegx: true);
+            port.WriteWait("root", "IRIS MFG Shell.*#", 5, isRegx: true);
 
         }
 

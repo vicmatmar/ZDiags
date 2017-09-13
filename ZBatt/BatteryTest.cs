@@ -25,10 +25,15 @@ namespace ZBatt
         bool _led_test_enabled = false;
         public bool LEDTestEnabled { get { return _led_test_enabled; } set { _led_test_enabled = value; } }
 
+        bool _cleanup_enabled = false;
+        public bool CleanupEnabled { get { return _cleanup_enabled; } set { _cleanup_enabled = value; } }
+
         string _host;
 
         public delegate void StatusHandler(object sender, string status_txt);
         public event StatusHandler Status_Event;
+
+        const string _ssh_prompt = "#";
 
         public BatteryTest(string host)
         {
@@ -64,9 +69,12 @@ namespace ZBatt
 
             DateTime start = DateTime.Now;
             if (LEDTestEnabled)
+            {
+                fire_status("LED Boot Test...");
                 LEDBootPatterTest();
+            }
             TimeSpan ts_total = DateTime.Now - start;
-            int ts_towait = 4000 - (int)ts_total.TotalSeconds*1000;
+            int ts_towait = 4000 - (int)ts_total.TotalSeconds * 1000;
             if (ts_towait > 0)
                 Thread.Sleep((int)ts_towait);
 
@@ -144,9 +152,10 @@ namespace ZBatt
                 ts_total += ts;
                 if (ts.TotalSeconds > 5)
                 {
-                    throw new Exception("Not all LED detected ON");
+                    throw new Exception("Not all LEDs detected ON");
                 }
             }
+            fire_status("LEDs detected ON");
 
             start = DateTime.Now;
             while (true)
@@ -166,6 +175,7 @@ namespace ZBatt
                     throw new Exception(emsg);
                 }
             }
+            fire_status("LEDs detected OFF");
 
         }
 
@@ -228,11 +238,44 @@ namespace ZBatt
             return values;
         }
 
+        string cleanup(SSHUtil ssh)
+        {
+
+            ssh.Data = "";
+
+            enterShell(ssh);
+
+            ssh.WriteWait(@"find /data/agent/ -type f -exec md5sum {} \; | sort -k 34 | md5sum", _ssh_prompt, 10, clear_data: false);
+
+            string[] cmd_list = new string[]
+            {
+                "cd /data/agent",
+                "chmod 0777 /data/agent",
+                "chown -R agent .",
+                "chgrp -R agent .",
+                "touch factory_reset",
+                "rm -f /data/log/messages*",
+                "rm -f /data/log/dmesg*",
+                "rm -f /data/zwave_*",
+                "cat data/mfg_test_report.json",
+                "rm -f /data/mfg_test_report.json",
+                "sync"
+            };
+            foreach(string cmd in cmd_list)
+            {
+                ssh.WriteWait(cmd, _ssh_prompt, clear_data:false);
+            }
+
+            exitShell(ssh);
+
+            return ssh.Data;
+        }
+
         static void enterShell(SSHUtil ssh)
         {
             // Enter debug
             ssh.WriteWait("debug", "debug>", 3);
-            // Enter Shelf
+            // Enter shell
             ssh.WriteWait("sh", "#", 3);
         }
 
