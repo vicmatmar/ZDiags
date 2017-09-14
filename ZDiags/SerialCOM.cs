@@ -76,13 +76,14 @@ namespace ZDiags
             }
 
         }
-        public void WriteWait(string cmd, string exp, int timeout_sec = 1, bool isRegx = false, bool clear_data = true)
+        public string WriteWait(string cmd, string exp, int timeout_sec = 1, bool isRegx = false, bool clear_data = true)
         {
+            string data = "";
             WriteLine(cmd);
             Thread.Sleep(150);
             try
             {
-                WaitFor(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
+                data = WaitFor(str: exp, timeout_sec: timeout_sec, isRegx: isRegx, clear_data: clear_data);
             }
             catch (TimeoutException ex)
             {
@@ -90,6 +91,8 @@ namespace ZDiags
                 msg += ex.Message;
                 throw new TimeoutException(msg);
             }
+
+            return data;
         }
 
         public void WriteLine(string txt = "")
@@ -108,11 +111,10 @@ namespace ZDiags
         /// <param name="isRegx">Whether to treat str as a regx</param>
         /// <param name="regxopt">regulat exp options</param>
         /// <returns>The position of the last occurance + the size of the string</returns>
-        public int WaitFor(string str, int timeout_sec = 1, int sample_ms = 500,
+        public string WaitFor(string str, int timeout_sec = 1, int sample_ms = 500,
             bool isRegx = false, RegexOptions regxopt = RegexOptions.Singleline, int startIndex = 0, bool clear_data = true)
         {
             DateTime start = DateTime.Now;
-            int index = -1;
             while (true)
             {
                 string data = "";
@@ -127,19 +129,17 @@ namespace ZDiags
                     Match match = Regex.Match(Data, str, regxopt);
                     if (match.Success)
                     {
-                        index = match.Index + match.Length;
                         break;
                     }
                 }
                 else
                 {
-                    index = data.LastIndexOf(str);
-                    if (index >= 0)
+                    if (data.LastIndexOf(str) >= 0)
                     {
-                        index = index + str.Length + 1;
                         break;
                     }
                 }
+
                 Thread.Sleep(sample_ms);
 
                 TimeSpan ts = DateTime.Now - start;
@@ -151,10 +151,11 @@ namespace ZDiags
                 }
             }
 
+            string outdata = Data;
             if (clear_data)
                 Data = "";
 
-            return index;
+            return outdata;
         }
 
 

@@ -83,7 +83,8 @@ namespace ZDiags
             fileloc = Path.Combine(LogFolder, "log_ble_data.txt");
             _fs_ble_data = new FileStream(fileloc, FileMode.Create, FileAccess.Write, FileShare.Read);
 
-            set_all_relays(false);
+            Set_all_relays(false);
+            Thread.Sleep(500);
             using (SerialCOM dutport = getDUTPort())
             using (SerialCOM bleport = getBLEPort())
             {
@@ -129,16 +130,17 @@ namespace ZDiags
 
             fire_status("BLE Test...");
             int trycount = 0;
-            while(true)
+            while (true)
             {
                 try
                 {
                     BLETest();
                     break;
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     string msg = ex.Message;
-                    if(!msg.Contains("BLE packets received"))
+                    if (!msg.Contains("BLE packets received"))
                         throw;
 
                     if (trycount++ > 3)
@@ -158,7 +160,7 @@ namespace ZDiags
             TimeSpan ts = DateTime.Now - start_time;
             string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
             fire_status(tmsg);
-            set_all_relays(false);
+            Set_all_relays(false);
         }
 
 
@@ -169,9 +171,8 @@ namespace ZDiags
                 // Make sure we can talk to hub
                 dutport.WriteWait("", "#", 3);
                 dutport.Data = "";
-                dutport.WriteWait("show mfg", "Batch Number:", 3, clear_data: false);
+                string mfg_data = dutport.WriteWait("show mfg", "Batch Number:", 3);
 
-                string mfg_data = dutport.Data;
                 fire_status(mfg_data);
 
                 string fileloc = Path.Combine(this.LogFolder, _smt_serial.ToString() + ".txt");
@@ -460,16 +461,6 @@ namespace ZDiags
                     mac = MACAddrUtils.GetNewMac();
                 int mac_id = MACAddrUtils.GetMacId(mac);
 
-                // Insert the hub
-                LowesHub lh = new LowesHub();
-                lh.customer_id = customer_id;
-                lh.hw_ver = _serialize_hw_version;
-                lh.mac_id = mac_id;
-                lh.smt_serial = _smt_serial.ToString();
-                lh.lowes_serial = Lowes_Serial;
-
-                cx.LowesHubs.Add(lh);
-                cx.SaveChanges();
 
                 string macstr = MACAddrUtils.LongToStr(mac);
 
@@ -481,6 +472,31 @@ namespace ZDiags
                 port.WriteLine(cmd);
                 port.WaitFor("Device serialization is complete - please reboot", 5);
                 fire_status("Device serialization is complete.");
+
+                port.Data = "";
+                string mfg_data = port.WriteWait("show mfg", "Batch Number:", 3);
+                Regex regx = new Regex(@"HubID:\s+([A-Z]+-\d+)");
+                Match m = regx.Match(mfg_data);
+                if(!m.Success || m.Groups.Count < 2)
+                {
+                    string emsg = string.Format("Unable to extract Hub id from data:{0}", mfg_data);
+                    throw new Exception(emsg);
+                }
+                string hubid = m.Groups[1].Value;
+                fire_status("Hub ID: " + hubid);
+
+                // Insert the hub
+                LowesHub lh = new LowesHub();
+                lh.customer_id = customer_id;
+                lh.hw_ver = _serialize_hw_version;
+                lh.mac_id = mac_id;
+                lh.smt_serial = _smt_serial.ToString();
+                lh.lowes_serial = Lowes_Serial;
+                lh.hub_id = hubid;
+
+                cx.LowesHubs.Add(lh);
+                cx.SaveChanges();
+
 
             }
 
@@ -499,7 +515,8 @@ namespace ZDiags
                 {
                     port.WriteWait("", "login:", 5);
                     break;
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     if (trycount++ > 3)
                         throw;
@@ -543,7 +560,7 @@ namespace ZDiags
 
         }
 
-        static void set_all_relays(bool value)
+        static public void Set_all_relays(bool value)
         {
             Array relays = Enum.GetValues(typeof(Relays));
             foreach (uint relay in relays)

@@ -64,7 +64,12 @@ namespace ZBatt
             fire_status("Cycle Power");
             BatteryJig.Set_all_relays(false);
             Thread.Sleep(500);
+            fire_status("Power on BATTERY");
+            BatteryJig.Write_SingleDIO(BatteryJig.Relays.BATT, true);
+            Thread.Sleep(500);
+            fire_status("Power on DUT");
             BatteryJig.Write_SingleDIO(BatteryJig.Relays.DUT, true);
+            Thread.Sleep(500);
 
 
             DateTime start = DateTime.Now;
@@ -90,8 +95,6 @@ namespace ZBatt
                 bootWait(ssh);
 
                 fire_status("Battery Test");
-                BatteryJig.Write_SingleDIO(BatteryJig.Relays.BATT, true);
-                Thread.Sleep(1000);
                 string data1 = ssh.WriteWait("show battery", "Level:", 3);
                 //fire_status(data1);
                 double volts1 = parseVolatge(data1);
@@ -211,7 +214,7 @@ namespace ZBatt
                 if (_red_led.isOff && _yellow_led.isOn && _green_led.isOn)
                 {
                     detected_count++;
-                    Thread.Sleep(250);
+                    Thread.Sleep(500);
 
                     if (detected_count > 5)
                         break;
@@ -253,10 +256,10 @@ namespace ZBatt
                 TimeSpan ts = DateTime.Now - start;
                 if (ts.TotalSeconds > 10)
                 {
-                    string emsg = string.Format("Not all LED detected OFF. R:{0} Y:{1} G:{2}",
+                    string emsg = string.Format("Not all LEDs detected OFF. R:{0} Y:{1} G:{2}",
                         _red_led.Value.ToString("G2"), _yellow_led.Value.ToString("G2"), _green_led.Value.ToString("G2"));
 
-                    emsg += string.Format("\r\nR{0} Y:{1} G{2}", _red_led.isOff, _yellow_led.isOff, _green_led.isOff);
+                    emsg += string.Format("\r\nR:{0} Y:{1} G{2}", _red_led.isOff, _yellow_led.isOff, _green_led.isOff);
                     throw new Exception(emsg);
                 }
             }

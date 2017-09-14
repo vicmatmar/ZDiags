@@ -21,6 +21,7 @@ namespace ZDiags
         public int customer_id { get; set; }
         public System.DateTime date { get; set; }
         public long lowes_serial { get; set; }
+        public string hub_id { get; set; }
     
         public virtual LowesCustomer LowesCustomer { get; set; }
         public virtual MacAddress MacAddress { get; set; }

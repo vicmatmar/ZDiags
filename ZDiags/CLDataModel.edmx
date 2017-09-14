@@ -23,6 +23,7 @@
           <Property Name="customer_id" Type="int" Nullable="false" />
           <Property Name="date" Type="datetime" Nullable="false" StoreGeneratedPattern="Computed" />
           <Property Name="lowes_serial" Type="bigint" Nullable="false" />
+          <Property Name="hub_id" Type="char" MaxLength="8" Nullable="false" />
         </EntityType>
         <EntityType Name="MacAddress">
           <Key>
@@ -155,6 +156,7 @@
           <NavigationProperty Name="LowesCustomer" Relationship="CLStoreModel.FK_LowesCustomersLowesHubs" FromRole="LowesHub" ToRole="LowesCustomer" />
           <NavigationProperty Name="MacAddress" Relationship="CLStoreModel.FK_LowesHubs_MacAddress" FromRole="LowesHub" ToRole="MacAddress" />
           <Property Name="lowes_serial" Type="Int64" Nullable="false" />
+          <Property Name="hub_id" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
         </EntityType>
         <EntityType Name="MacAddress">
           <Key>
@@ -235,6 +237,7 @@
           <EntitySetMapping Name="LowesHubs">
             <EntityTypeMapping TypeName="CLStoreModel.LowesHub">
               <MappingFragment StoreEntitySet="LowesHubs">
+                <ScalarProperty Name="hub_id" ColumnName="hub_id" />
                 <ScalarProperty Name="lowes_serial" ColumnName="lowes_serial" />
                 <ScalarProperty Name="date" ColumnName="date" />
                 <ScalarProperty Name="customer_id" ColumnName="customer_id" />

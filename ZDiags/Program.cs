@@ -110,6 +110,10 @@ namespace ZDiags
 
                 return -1;
             }
+            finally
+            {
+                Diags.Set_all_relays(false);
+            }
             Console.WriteLine("All Tests Passed");
 
             return 0;
