@@ -8,9 +8,90 @@ using ZCommon;
 
 namespace ZBatt
 {
+
+    public class LED_Group
+    {
+        LED[] _leds;
+        public LED[] LEDS { get { return _leds; } }
+
+        public LED_Group(LED[] leds)
+        {
+            _leds = leds;
+        }
+
+        public LED Get(string color_name)
+        {
+            foreach (LED led in _leds)
+            {
+                if (led.ColorName == color_name)
+                    return led;
+            }
+
+            throw new ArgumentException("No led with " + color_name + " color name");
+        }
+
+        uint[] get_linenums()
+        {
+            uint[] linemums = new uint[_leds.Length];
+            for (int i = 0; i < linemums.Length; i++)
+                linemums[i] = _leds[i].AILineNum;
+            return linemums;
+        }
+
+        public double[] ReadValues()
+        {
+            uint[] linemums = get_linenums();
+            double[] values = NIUtils.Read_MultiAi(linemums);
+            for (int i = 0; i < linemums.Length; i++)
+                _leds[i].LastValue = values[i];
+
+            return values;
+        }
+
+        public bool areOn
+        {
+            get
+            {
+                bool ison = true;
+                double[] values = ReadValues();
+                for (int i = 0; i < values.Length; i++)
+                {
+                    ison &= _leds[i].getIsOn(values[i]);
+                }
+                return ison;
+            }
+        }
+
+        public bool areOff
+        {
+            get { return !areOn; }
+        }
+
+        public bool arePattern(bool[] pattern)
+        {
+            bool ispattern = true;
+            double[] values = ReadValues();
+            for (int i = 0; i < values.Length; i++)
+            {
+                ispattern &= (_leds[i].getIsOn(values[i]) == pattern[i]);
+            }
+            return ispattern;
+
+        }
+
+        public void ResetMaxValues()
+        {
+            foreach (LED led in _leds)
+                led.ResetMaxVal();
+        }
+
+    }
+
+
     public class LED
     {
         uint _ai_linenum = 0;
+        public uint AILineNum { get { return _ai_linenum; } }
 
         double _off_val = double.MinValue;
         public double OffVal { get { return _off_val; } set { _off_val = value; } }
@@ -22,7 +103,14 @@ namespace ZBatt
 
         const string _fs_control_path_fmt = "/sys/class/leds/{0}/brightness";
         string _color_name;
-        public string ColorName {  get { return _color_name; } set { _color_name = value; } }
+        public string ColorName { get { return _color_name; } set { _color_name = value; } }
+
+        double _max_value = double.MinValue;
+        public double MaxValue { get { return _max_value; } }
+
+        double _min_value = double.MaxValue;
+        public double MinValue { get { return _min_value; } }
+
 
         public LED(uint ai, double off_val, double on_val, string color_name = null)
         {
@@ -38,15 +126,47 @@ namespace ZBatt
             _color_name = color_name;
         }
 
+
+        public void ResetMaxVal()
+        {
+            _max_value = double.MinValue;
+        }
+
+        public void ResetMinVal()
+        {
+            _min_value = double.MinValue;
+        }
+
         double _last_value = double.MinValue;
         public double LastValue
         {
             get { return _last_value; }
+            set {
+
+                _last_value = value;
+
+                if (_last_value > _max_value)
+                    _max_value = value;
+                if (_last_value < _min_value)
+                    _min_value = value;
+
+            }
         }
 
+        /// <summary>
+        /// Reads voltage vallue from NI box
+        /// </summary>
         public double Value
         {
-            get { return NIUtils.Read_SingelAi(_ai_linenum); }
+            get {
+                double value = NIUtils.Read_SingelAi(_ai_linenum);
+
+                _last_value = value;
+
+                return value;
+            }
+
+            set { _last_value = value; }
         }
 
         public void Turn(bool value, SSHUtil ssh)
@@ -65,27 +185,37 @@ namespace ZBatt
         }
 
 
+        public bool getIsOn(double value)
+        {
+            if (value > _mid_val_point)
+                return true;
+            else
+                return false;
+        }
+
+
+        /// <summary>
+        /// This function causes a voltage read
+        /// </summary>
         public bool isOn
         {
             get
             {
-                _last_value = Value;
-                if (_last_value > _mid_val_point)
+                if (Value > _mid_val_point)
                     return true;
                 else
                     return false;
             }
         }
 
+        /// <summary>
+        /// This function causes a voltage read
+        /// </summary>
         public bool isOff
         {
             get
             {
-                _last_value = Value;
-                if (_last_value < _mid_val_point)
-                    return true;
-                else
-                    return false;
+                return !isOn;
             }
         }
 

@@ -13,6 +13,7 @@ namespace ZBatt
     public class BatteryTest
     {
 
+        LED_Group _leds;
         LED _red_led;
         public LED LED_Red { get { return _red_led; } }
 
@@ -21,6 +22,7 @@ namespace ZBatt
 
         LED _yellow_led;
         public LED LED_Yellow { get { return _yellow_led; } }
+
 
         bool _led_test_enabled = false;
         public bool LEDTestEnabled { get { return _led_test_enabled; } set { _led_test_enabled = value; } }
@@ -32,7 +34,7 @@ namespace ZBatt
 
         public enum Status_Level { Info, Debug }
 
-        public delegate void StatusHandler(object sender, string status_txt, Status_Level level=Status_Level.Info);
+        public delegate void StatusHandler(object sender, string status_txt, Status_Level level = Status_Level.Info);
         public event StatusHandler Status_Event;
 
 
@@ -43,8 +45,10 @@ namespace ZBatt
             _host = host;
 
             _red_led = new LED((uint)BatteryJig.Sensors.RED_LIGHT, 0.25, 0.5, "red");
-            _yellow_led = new LED((uint)BatteryJig.Sensors.YELLOW_LIGHT, 0.01, 0.18, "yellow");
             _green_led = new LED((uint)BatteryJig.Sensors.GREEN_LIGHT, 0.001, 0.06, "green");
+            _yellow_led = new LED((uint)BatteryJig.Sensors.YELLOW_LIGHT, 0.01, 0.18, "yellow");
+
+            _leds = new LED_Group(new LED[] { _red_led, _green_led, _yellow_led });
 
         }
 
@@ -159,7 +163,7 @@ namespace ZBatt
                         try
                         {
                             LEDBootPatternTest();
-                            Thread.Sleep(5000);
+                            Thread.Sleep(3000);
                         }
                         catch
                         {
@@ -242,31 +246,20 @@ namespace ZBatt
         {
             DateTime start = DateTime.Now;
 
-            double[] vals = new double[3] { double.MinValue, double.MinValue, double.MinValue } ;
+            _leds.ResetMaxValues();
             while (true)
             {
-                if (_red_led.isOn && _yellow_led.isOn && _green_led.isOn)
+                //if (_red_led.isOn && _yellow_led.isOn && _green_led.isOn)
+                if(_leds.areOn)
                 {
                     break;
                 }
-                else
-                {
-                    int i = 0;
-                    if (_red_led.LastValue > vals[i])
-                        vals[i] = _red_led.LastValue;
-                    i++;
-                    if (_green_led.LastValue > vals[i])
-                        vals[i] = _green_led.LastValue;
-                    i++;
-                    if (_yellow_led.LastValue > vals[i])
-                        vals[i] = _yellow_led.LastValue;
-                    i++;
-                }
+
                 TimeSpan ts = DateTime.Now - start;
-                if (ts.TotalSeconds > 5)
+                if (ts.TotalSeconds > 4)
                 {
                     string emsg = string.Format("Not all LEDs detected ON. R:{0}, G:{1}, Y:{2}",
-                        vals[0].ToString("G2"), vals[2].ToString("G2"), vals[2].ToString("G2"));
+                        _red_led.MaxValue.ToString("G2"), _green_led.MaxValue.ToString("G2"), _yellow_led.MaxValue.ToString("G2"));
                     throw new Exception(emsg);
                 }
             }
@@ -275,7 +268,7 @@ namespace ZBatt
             start = DateTime.Now;
             while (true)
             {
-                if (_red_led.isOff && _yellow_led.isOff && _green_led.isOff)
+                if (_leds.areOff)
                 {
                     break;
                 }
@@ -449,7 +442,7 @@ namespace ZBatt
             return value;
         }
 
-        void fire_status(string msg, Status_Level status_level=Status_Level.Info)
+        void fire_status(string msg, Status_Level status_level = Status_Level.Info)
         {
             Status_Event?.Invoke(this, msg, status_level);
         }

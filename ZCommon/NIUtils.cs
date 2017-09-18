@@ -9,6 +9,25 @@ namespace ZCommon
 {
     public class NIUtils
     {
+
+        static public double[] Read_MultiAi(uint[] linenums)
+        {
+            using (Task analogReaderTask = new Task())
+            {
+                //  Create channel and name it.
+                for (uint i = 0; i < linenums.Length; i++)
+                {
+                    string linestr = string.Format("{0}", get_PhysicalAIChannel((int)i));
+                    string name = string.Format("ai{0}", i);
+                    analogReaderTask.AIChannels.CreateVoltageChannel(linestr, name, AITerminalConfiguration.Rse, 0, 5, AIVoltageUnits.Volts);
+                }
+                AnalogMultiChannelReader reader = new AnalogMultiChannelReader(analogReaderTask.Stream);
+
+                double[] values = reader.ReadSingleSample();
+                return values;
+            }
+        }
+
         static public double Read_SingelAi(uint linenum)
         {
             string ai_port_desc = get_PhysicalAIChannel((int)linenum);
