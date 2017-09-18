@@ -54,10 +54,14 @@ namespace ZBatt
 
         static SSHUtil _ssh;
 
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static int Main(string[] args)
         {
             //Console.WriteLine("Press Enter to continue");
             //Console.Read();
+
+            _log.Info("App started");
 
             var options = new Options();
             var parser_options = new CommandLine.ParserSettings { MutuallyExclusive = true };
@@ -75,6 +79,9 @@ namespace ZBatt
                 BatteryTest batcal = new BatteryTest(options.Host);
                 double[] values = batcal.GetLEDsValues();
                 int i = 0;
+
+                _log.InfoFormat("Red On   : {0}", values[i++].ToString("G2"));
+
                 Console.WriteLine("Red On   : {0}", values[i++].ToString("G2"));
                 Console.WriteLine("Green On : {0}", values[i++].ToString("G2"));
                 Console.WriteLine("Yellow On: {0}", values[i++].ToString("G2"));
@@ -122,22 +129,40 @@ namespace ZBatt
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine();
-                Console.WriteLine(ex.StackTrace);
+                _log.Fatal(ex.Message + "\r\n" + ex.StackTrace);
+                //Console.WriteLine(ex.Message);
+                //Console.WriteLine();
+                //Console.WriteLine(ex.StackTrace);
 
                 return -2;
             }
+            finally
+            {
+                BatteryJig.Set_all_relays(false);
+            }
 
-            Console.WriteLine("All Tests Passed");
+            _log.Info("All Tests Passed");
+            //Console.WriteLine("All Tests Passed");
 
             return 0;
         }
 
-        private static void Battery_test_Status_Event(object sender, string status_txt)
+        private static void Battery_test_Status_Event(object sender, string status_txt, BatteryTest.Status_Level status_level)
         {
-            string msg = string.Format("{0:G}: {1}", DateTime.Now, status_txt);
-            Console.WriteLine(msg);
+            //string msg = string.Format("{0:G}: {1}", DateTime.Now, status_txt);
+            //Console.WriteLine(msg);
+            switch(status_level)
+            {
+                case BatteryTest.Status_Level.Info:
+                    _log.Info(status_txt);
+                    break;
+                case BatteryTest.Status_Level.Debug:
+                    _log.Debug(status_txt);
+                    break;
+                default:
+                    _log.Info(status_txt);
+                    break;
+            }
         }
 
         static void write_SingleDIO(Relays relay, bool value)

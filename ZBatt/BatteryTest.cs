@@ -30,8 +30,11 @@ namespace ZBatt
 
         string _host;
 
-        public delegate void StatusHandler(object sender, string status_txt);
+        public enum Status_Level { Info, Debug }
+
+        public delegate void StatusHandler(object sender, string status_txt, Status_Level level=Status_Level.Info);
         public event StatusHandler Status_Event;
+
 
         const string _ssh_prompt = "#";
 
@@ -55,21 +58,18 @@ namespace ZBatt
         public void Run()
         {
 
-            // For some reason we need to power using main first 
-            // and wait sometime before we apply battery power or the hub
-            // won't be.  3 seconds seems to be enough.
-            // Also if we don't have battery applied before we log in
-            // we get wrong values.
+            // There seems to be a problem with the jigs I have not been able to discovered yet.
+            // The test should be to apply battery power fisrt, then main power and the board should boot.
+            // Does not happen in the jig.
+            // I'm able to sypply battery power using jig and manually connect main power to a transformer and
+            // it works. So it seems to be a problem with the jig and not the units.
 
             fire_status("Cycle Power");
             BatteryJig.Set_all_relays(false);
             Thread.Sleep(500);
-            fire_status("Power on BATTERY");
-            BatteryJig.Write_SingleDIO(BatteryJig.Relays.BATT, true);
-            Thread.Sleep(500);
             fire_status("Power on DUT");
             BatteryJig.Write_SingleDIO(BatteryJig.Relays.DUT, true);
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
 
             DateTime start = DateTime.Now;
@@ -83,7 +83,7 @@ namespace ZBatt
             if (ts_towait > 0)
                 Thread.Sleep((int)ts_towait);
 
-
+            fire_status("Power on BATTERY");
             BatteryJig.Write_SingleDIO(BatteryJig.Relays.BATT, true);
             Thread.Sleep(1000);
 
@@ -95,43 +95,50 @@ namespace ZBatt
                 bootWait(ssh);
 
                 fire_status("Battery Test");
-                string data1 = ssh.WriteWait("show battery", "Level:", 3);
-                //fire_status(data1);
-                double volts1 = parseVolatge(data1);
-                string msg1 = string.Format("Battery voltage before DUT power removed detected at {0}", volts1);
-                fire_status(msg1);
-                if (volts1 < 5.0)
+                string data = ssh.WriteWait("show battery", "Level:", 3);
+                double volts = parseVolatge(data);
+                string msg = string.Format("Battery voltage before DUT power removed detected at {0}", volts);
+                fire_status(msg);
+                if (volts < 5.0)
                 {
-                    string emsg = string.Format("Battery power before DUT power removed too low.  Detected at {0}", volts1);
-                    throw new Exception(emsg);
+                    msg = string.Format("Battery power before DUT power removed too low.  Detected at {0}", volts);
+                    throw new Exception(msg);
                 }
+
 
                 fire_status("DUT power off");
                 BatteryJig.Write_SingleDIO(BatteryJig.Relays.DUT, false);
-                Thread.Sleep(2000);
+                Thread.Sleep(3000);
 
-                string data2 = ssh.WriteWait("show battery", "Level:", 3);
-                //fire_status(data2);
-                double volts2 = parseVolatge(data2);
-                string msg2 = string.Format("Battery voltage after DUT power removed detected at {0}", volts2);
-                fire_status(msg2);
-                if (volts2 < 4.0)
+                data = ssh.WriteWait("show battery", "Level:", 3);
+                volts = parseVolatge(data);
+                msg = string.Format("Battery voltage after DUT power removed detected at {0}", volts);
+                fire_status(msg);
+                if (volts < 4.0)
                 {
-                    string emsg = string.Format("Battery power after DUT power removed too low.  Detected at {0}", volts2);
-                    throw new Exception(emsg);
+                    msg = string.Format("Battery power after DUT power removed too low.  Detected at {0}", volts);
+                    throw new Exception(msg);
                 }
 
                 fire_status("DUT power back on");
                 BatteryJig.Write_SingleDIO(BatteryJig.Relays.DUT, true);
-                Thread.Sleep(500);
-                string data3 = ssh.WriteWait("show battery", "Level:", 3);
-                fire_status(data3);
+                Thread.Sleep(1000);
+
+                data = ssh.WriteWait("show battery", "Level:", 3);
+                volts = parseVolatge(data);
+                msg = string.Format("Battery voltage after DUT power re-applied at {0}", volts);
+                fire_status(msg);
+                if (volts < 5.0)
+                {
+                    msg = string.Format("Battery power after DUT power ed too low.  Detected at {0}", volts);
+                    throw new Exception(msg);
+                }
 
                 if (InvalidateEnabled)
                 {
                     fire_status("Clean up...");
-                    string data = cleanup(ssh);
-                    fire_status(data);
+                    data = cleanup(ssh);
+                    fire_status(data, Status_Level.Debug);
 
                     fire_status("Invalidate...");
 
@@ -143,30 +150,32 @@ namespace ZBatt
                     BatteryJig.Write_SingleDIO(BatteryJig.Relays.BATT, false); // If batt is not off, we can't reboot (weird!)
                     Thread.Sleep(5000);
 
-                    // Check for the boot LED pattern
-                    // then check it changes
+                    // Check for the boot LED pattern until it fails
                     LEDBootPatternTest();
                     start = DateTime.Now;
+                    TimeSpan ts;
                     while (true)
                     {
                         try
                         {
                             LEDBootPatternTest();
-                            Thread.Sleep(3000);
+                            Thread.Sleep(5000);
                         }
                         catch
                         {
                             break;
                         }
 
-                        TimeSpan ts = DateTime.Now - start;
-                        if (ts.TotalSeconds > 15)
+                        ts = DateTime.Now - start;
+                        if (ts.TotalSeconds > 30)
                             throw new Exception("LED pattern did not changed");
                     }
+                    ts = DateTime.Now - start;
+                    // The LED patter should have changed
 
                     LEDInvalidatedPatternTest();
 
-                    // Check our connection is fried
+                    // Check our connection is not good anymore
                     if (ssh.IsConnected)
                         throw new Exception("Our ssh is still connected. Are you sure the hub rebootted?");
 
@@ -178,7 +187,7 @@ namespace ZBatt
                     }
                     catch (Exception ex)
                     {
-                        string emsg = ex.Message;
+                        msg = ex.Message;
                     }
 
                     // To revert using chipserver
@@ -232,16 +241,33 @@ namespace ZBatt
         void LEDBootPatternTest()
         {
             DateTime start = DateTime.Now;
+
+            double[] vals = new double[3] { double.MinValue, double.MinValue, double.MinValue } ;
             while (true)
             {
                 if (_red_led.isOn && _yellow_led.isOn && _green_led.isOn)
                 {
                     break;
                 }
+                else
+                {
+                    int i = 0;
+                    if (_red_led.LastValue > vals[i])
+                        vals[i] = _red_led.LastValue;
+                    i++;
+                    if (_green_led.LastValue > vals[i])
+                        vals[i] = _green_led.LastValue;
+                    i++;
+                    if (_yellow_led.LastValue > vals[i])
+                        vals[i] = _yellow_led.LastValue;
+                    i++;
+                }
                 TimeSpan ts = DateTime.Now - start;
                 if (ts.TotalSeconds > 5)
                 {
-                    throw new Exception("Not all LEDs detected ON");
+                    string emsg = string.Format("Not all LEDs detected ON. R:{0}, G:{1}, Y:{2}",
+                        vals[0].ToString("G2"), vals[2].ToString("G2"), vals[2].ToString("G2"));
+                    throw new Exception(emsg);
                 }
             }
             fire_status("LEDs detected ON");
@@ -423,9 +449,9 @@ namespace ZBatt
             return value;
         }
 
-        void fire_status(string msg)
+        void fire_status(string msg, Status_Level status_level=Status_Level.Info)
         {
-            Status_Event?.Invoke(this, msg);
+            Status_Event?.Invoke(this, msg, status_level);
         }
 
     }
