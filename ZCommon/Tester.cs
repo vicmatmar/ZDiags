@@ -7,23 +7,17 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ZDiags
+namespace CLData
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class LowesHub
+    public partial class Tester
     {
+        public string Name { get; set; }
+        public Nullable<int> Pin { get; set; }
+        public System.DateTime CreateDate { get; set; }
         public int Id { get; set; }
-        public int mac_id { get; set; }
-        public string smt_serial { get; set; }
-        public int hw_ver { get; set; }
-        public int customer_id { get; set; }
-        public System.DateTime date { get; set; }
-        public long lowes_serial { get; set; }
-        public string hub_id { get; set; }
-    
-        public virtual LowesCustomer LowesCustomer { get; set; }
-        public virtual MacAddress MacAddress { get; set; }
+        public bool Active { get; set; }
     }
 }

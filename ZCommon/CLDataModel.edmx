@@ -47,6 +47,16 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="StationMac" Type="char" MaxLength="12" Nullable="false" />
         </EntityType>
+        <EntityType Name="Tester">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Name" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="Pin" Type="int" />
+          <Property Name="CreateDate" Type="datetime" Nullable="false" />
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Active" Type="bit" Nullable="false" />
+        </EntityType>
         <Association Name="FK_LowesCustomersLowesHubs">
           <End Role="LowesCustomers" Type="Self.LowesCustomers" Multiplicity="1" />
           <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
@@ -94,6 +104,7 @@
           <EntitySet Name="MacAddress" EntityType="Self.MacAddress" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StationSite" EntityType="Self.StationSite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StationSiteId" EntityType="Self.StationSiteId" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Tester" EntityType="Self.Tester" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_LowesCustomersLowesHubs" Association="Self.FK_LowesCustomersLowesHubs">
             <End Role="LowesCustomers" EntitySet="LowesCustomers" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
@@ -134,6 +145,7 @@
             <End Role="StationSite" EntitySet="StationSites" />
             <End Role="StationSiteId" EntitySet="StationSiteIds" />
           </AssociationSet>
+          <EntitySet Name="Testers" EntityType="CLStoreModel.Tester" />
           </EntityContainer>
         <EntityType Name="LowesCustomer">
           <Key>
@@ -219,6 +231,16 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Tester">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="Pin" Type="Int32" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -270,6 +292,17 @@
               <MappingFragment StoreEntitySet="StationSiteId">
                 <ScalarProperty Name="StationMac" ColumnName="StationMac" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Testers">
+            <EntityTypeMapping TypeName="CLStoreModel.Tester">
+              <MappingFragment StoreEntitySet="Tester">
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="Pin" ColumnName="Pin" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Data.Entity.Core.Objects;
 using System.Net.NetworkInformation;
 
+using ZCommon;
+
 namespace ZDiags
 {
     class MACAddrUtils
@@ -38,7 +40,7 @@ namespace ZDiags
         public static long GetNewMac()
         {
             long mac_out = INVALID_MAC;
-            using (CLStoreEntities context = new CLStoreEntities())
+            using (CLData.CLStoreEntities context = new CLData.CLStoreEntities())
             {
                 ObjectParameter newmac = new ObjectParameter("newmac", typeof(long));
                 //try
@@ -70,7 +72,7 @@ namespace ZDiags
         public static int GetMacId(long mac)
         {
             int id = INVALID_ID;
-            using (CLStoreEntities cx = new CLStoreEntities())
+            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
             {
                 var q = cx.MacAddresses.Where(m => m.MAC == mac);
                 if (q.Any())
@@ -102,7 +104,7 @@ namespace ZDiags
 
         public static void DeleteBlock()
         {
-            using (CLStoreEntities context = new CLStoreEntities())
+            using (CLData.CLStoreEntities context = new CLData.CLStoreEntities())
             {
                 var addrs = context.MacAddresses.Where(m => m.MAC >= BlockStartAddr && m.MAC < BlockEndAddr);
                 context.MacAddresses.RemoveRange(addrs);
@@ -131,7 +133,7 @@ namespace ZDiags
 
         public static int ProductionSiteId()
         {
-            using (CLStoreEntities cx = new CLStoreEntities())
+            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
             {
                 foreach (string mac in StationMACS)
                 {
@@ -148,7 +150,7 @@ namespace ZDiags
 
         public static int StationSiteId()
         {
-            using (CLStoreEntities cx = new CLStoreEntities())
+            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
             {
                 foreach (string mac in StationMACS)
                 {
@@ -162,7 +164,7 @@ namespace ZDiags
                         // Add if this MAC is in the StationSite table
                         if(cx.StationSites.Where(s=>s.StationMac == mac).Any())
                         {
-                            StationSiteId si = new ZDiags.StationSiteId();
+                            CLData.StationSiteId si = new CLData.StationSiteId();
                             si.StationMac = mac;
 
                             cx.StationSiteIds.Add(si);

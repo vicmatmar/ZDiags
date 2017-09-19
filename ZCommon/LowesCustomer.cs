@@ -7,22 +7,21 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ZDiags
+namespace CLData
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class MacAddress
+    public partial class LowesCustomer
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public MacAddress()
+        public LowesCustomer()
         {
             this.LowesHubs = new HashSet<LowesHub>();
         }
     
         public int Id { get; set; }
-        public long MAC { get; set; }
-        public System.DateTime Date { get; set; }
+        public string Name { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LowesHub> LowesHubs { get; set; }

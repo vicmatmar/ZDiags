@@ -420,7 +420,7 @@ namespace ZDiags
 
         public void Serialize()
         {
-            using (CLStoreEntities cx = new CLStoreEntities())
+            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
             using (SerialCOM port = getDUTPort())
             {
                 // Gather info to serialize hub
@@ -447,7 +447,7 @@ namespace ZDiags
                 if (hubsq.Any())
                 {
                     var hubs = hubsq.ToArray();
-                    foreach (LowesHub hub in hubs)
+                    foreach (CLData.LowesHub hub in hubs)
                     {
                         long hubmac = hub.MacAddress.MAC;
                         if (MACAddrUtils.Inrange(hubmac))
@@ -486,7 +486,7 @@ namespace ZDiags
                 fire_status("Hub ID: " + hubid);
 
                 // Insert the hub
-                LowesHub lh = new LowesHub();
+                CLData.LowesHub lh = new CLData.LowesHub();
                 lh.customer_id = customer_id;
                 lh.hw_ver = _serialize_hw_version;
                 lh.mac_id = mac_id;

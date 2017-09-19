@@ -7,23 +7,23 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ZDiags
+namespace CLData
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class LowesCustomer
+    public partial class StationSite
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public LowesCustomer()
+        public StationSite()
         {
-            this.LowesHubs = new HashSet<LowesHub>();
+            this.StationSiteIds = new HashSet<StationSiteId>();
         }
     
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public string StationMac { get; set; }
+        public int ProductionSiteId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<LowesHub> LowesHubs { get; set; }
+        public virtual ICollection<StationSiteId> StationSiteIds { get; set; }
     }
 }

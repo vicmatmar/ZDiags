@@ -62,32 +62,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLDataModel.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CLDataModel.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="CLDataModel.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CLDataModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="CLDataModel.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CLDataModel.edmx</DependentUpon>
-    </Compile>
     <Compile Include="Diags.cs" />
-    <Compile Include="LowesCustomer.cs">
-      <DependentUpon>CLDataModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="LowesHub.cs">
-      <DependentUpon>CLDataModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="LowesSerial.cs" />
-    <Compile Include="MacAddress.cs">
-      <DependentUpon>CLDataModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="MACAddrUtils.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
@@ -98,23 +74,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SerialCOM.cs" />
-    <Compile Include="StationSite.cs">
-      <DependentUpon>CLDataModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="StationSiteId.cs">
-      <DependentUpon>CLDataModel.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
-    </None>
-    <EntityDeploy Include="CLDataModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>CLDataModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <None Include="CLDataModel.edmx.diagram">
-      <DependentUpon>CLDataModel.edmx</DependentUpon>
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
@@ -126,18 +89,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="CLDataModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>CLDataModel.edmx</DependentUpon>
-      <LastGenOutput>CLDataModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="CLDataModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>CLDataModel.edmx</DependentUpon>
-      <LastGenOutput>CLDataModel.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migration\" />

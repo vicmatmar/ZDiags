@@ -7,8 +7,8 @@
     <ProjectGuid>{68E541C8-A879-40DA-9C25-028D77B867DF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NIUtils</RootNamespace>
-    <AssemblyName>NIUtils</AssemblyName>
+    <RootNamespace>ZCommon</RootNamespace>
+    <AssemblyName>ZCommon</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,6 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="NationalInstruments.Common, Version=15.1.40.49152, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NI\lib\NationalInstruments.Common.dll</HintPath>
@@ -39,6 +45,7 @@
       <HintPath>..\packages\NI\lib\NationalInstruments.DAQmx.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,8 +55,69 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLDataModel.Context.cs">
+      <DependentUpon>CLDataModel.Context.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CLDataModel.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CLDataModel.Designer.cs">
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="LowesCustomer.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LowesHub.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="MacAddress.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="NIUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StationSite.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StationSiteId.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Tester.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="CLDataModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>CLDataModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CLDataModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
+      <LastGenOutput>CLDataModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="CLDataModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
+      <LastGenOutput>CLDataModel.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config" />
+    <None Include="CLDataModel.edmx.diagram">
+      <DependentUpon>CLDataModel.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
