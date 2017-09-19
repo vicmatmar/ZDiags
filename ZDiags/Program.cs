@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 
 using System.IO;
+using System.Text.RegularExpressions;
+using ZCommon;
 
 namespace ZDiags
 {
@@ -60,16 +62,26 @@ namespace ZDiags
                 customer = Diags.Customer.Amazone;
             Console.WriteLine("Custumer: " + customer.ToString());
             Console.WriteLine("HW Version: " + options.HW_Version);
+
+            string tester = DataUtils.TesterName(options.Tester);
+            int tester_id = DataUtils.TesterId(tester);
+            Console.WriteLine("Tester: " + tester);
             Console.WriteLine();
 
             Console.WriteLine("Run Tests...");
             try
             {
-                using (
-                    Diags diags = new Diags(
+                using 
+                (
+                    Diags diags = new Diags
+                    (
                         dut_port_name: com_dut, ble_port_name: com_ble,
-                        smt_serial: options.smt_serial, customer: customer, hw_version: options.HW_Version)
-                      )
+                        smt_serial: options.smt_serial, 
+                        customer: customer, 
+                        hw_version: options.HW_Version,
+                        tester: tester
+                    )
+                )
                 {
 
                     

@@ -38,5 +38,9 @@ namespace ZDiags
             HelpText = "Board version")]
         public char HW_Version { get; set; }
 
+        [Option("tester", Required = true, 
+            HelpText = "Tester Name LastName")]
+        public string Tester { get; set; }
+
     }
 }

@@ -70,6 +70,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="DataUtils.cs" />
     <Compile Include="LowesCustomer.cs">
       <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>

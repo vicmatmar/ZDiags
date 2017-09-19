@@ -31,6 +31,8 @@ namespace ZDiags
         string _serialize_model = "IH200";
         char _serialize_hw_version = '4';
 
+        string _tester;
+
         bool _program_radios = true;
         public bool Program_Radios { get { return _program_radios; } set { _program_radios = value; } }
 
@@ -53,7 +55,7 @@ namespace ZDiags
         bool _zwave_updated = false;
 
 
-        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version)
+        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version, string tester="Victor Martin")
         {
             _dutport_name = dut_port_name;
             _bleport_name = ble_port_name;
@@ -61,6 +63,8 @@ namespace ZDiags
             _smt_serial = smt_serial;
             _custumer = customer;
             _serialize_hw_version = hw_version;
+
+            _tester = tester;
 
             MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Block_Start;
             MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Block_End;
@@ -160,7 +164,6 @@ namespace ZDiags
             TimeSpan ts = DateTime.Now - start_time;
             string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
             fire_status(tmsg);
-            Set_all_relays(false);
         }
 
 
@@ -427,13 +430,15 @@ namespace ZDiags
                 int production_site_id = MACAddrUtils.ProductionSiteId();
                 int test_station_id = MACAddrUtils.StationSiteId();
 
+                int tester_id = DataUtils.TesterId(_tester);
+
                 _lowes_serial = LowesSerial.GetSerial(
                         model: LowesSerial.Model.IH200,
                         hw_version: (byte)_serialize_hw_version,
                         datetime: DateTime.Now,
                         factory: (byte)production_site_id,
                         test_station: (byte)test_station_id,
-                        tester: 2);
+                        tester: (short)tester_id);
 
                 // Make sure we can talk to hub
                 port.WriteLine();
