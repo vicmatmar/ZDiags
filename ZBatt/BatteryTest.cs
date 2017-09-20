@@ -37,7 +37,6 @@ namespace ZBatt
         public delegate void StatusHandler(object sender, string status_txt, Status_Level level = Status_Level.Info);
         public event StatusHandler Status_Event;
 
-
         const string _ssh_prompt = "#";
 
         public BatteryTest(string host)

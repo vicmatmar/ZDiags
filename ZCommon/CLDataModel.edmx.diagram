@@ -5,15 +5,17 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="3d3373cf67324323a9ac2f392c1a03f9" Name="Diagram1">
-        <EntityTypeShape EntityType="CLStoreModel.LowesCustomer" Width="1.5" PointX="0.75" PointY="1.375" />
-        <EntityTypeShape EntityType="CLStoreModel.LowesHub" Width="1.5" PointX="3.125" PointY="0.875" />
-        <EntityTypeShape EntityType="CLStoreModel.MacAddress" Width="1.5" PointX="0.75" PointY="3.75" />
+        <EntityTypeShape EntityType="CLStoreModel.LowesCustomer" Width="1.5" PointX="8.5" PointY="1.875" />
+        <EntityTypeShape EntityType="CLStoreModel.LowesHub" Width="1.5" PointX="6.5" PointY="1.75" />
+        <EntityTypeShape EntityType="CLStoreModel.MacAddress" Width="1.5" PointX="8.5" PointY="4" />
         <AssociationConnector Association="CLStoreModel.FK_LowesCustomersLowesHubs" />
         <AssociationConnector Association="CLStoreModel.FK_LowesHubs_MacAddress" />
-        <EntityTypeShape EntityType="CLStoreModel.StationSite" Width="1.5" PointX="5.875" PointY="1" />
-        <EntityTypeShape EntityType="CLStoreModel.StationSiteId" Width="1.5" PointX="8.125" PointY="1" />
+        <EntityTypeShape EntityType="CLStoreModel.StationSite" Width="1.5" PointX="0.5" PointY="0.75" />
+        <EntityTypeShape EntityType="CLStoreModel.StationSiteId" Width="1.5" PointX="2.625" PointY="0.75" />
         <AssociationConnector Association="CLStoreModel.FK_StationMac_ToTable" />
-        <EntityTypeShape EntityType="CLStoreModel.Tester" Width="1.5" PointX="5.875" PointY="3.25" />
+        <EntityTypeShape EntityType="CLStoreModel.Operator" Width="1.5" PointX="4.75" PointY="2.375" />
+        <AssociationConnector Association="CLStoreModel.FK_LowesHubs_Operator" />
+        <AssociationConnector Association="CLStoreModel.FK_LowesHubs_Station" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

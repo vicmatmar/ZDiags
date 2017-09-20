@@ -81,14 +81,14 @@
       <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="NIUtils.cs" />
+    <Compile Include="Operator.cs">
+      <DependentUpon>CLDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StationSite.cs">
       <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="StationSiteId.cs">
-      <DependentUpon>CLDataModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Tester.cs">
       <DependentUpon>CLDataModel.tt</DependentUpon>
     </Compile>
   </ItemGroup>

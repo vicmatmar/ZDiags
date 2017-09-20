@@ -9,7 +9,7 @@ namespace ZCommon
     public class DataUtils
     {
 
-        public static string TesterName(string txt)
+        public static string OperatorName(string txt)
         {
             if (txt == null || txt == "")
             {
@@ -32,24 +32,19 @@ namespace ZCommon
 
         }
 
-        public static int TesterId(string tester)
+        public static int OperatorId(string tester)
         {
-            string name = TesterName(tester);
+            string name = OperatorName(tester);
             int id = -1;
-            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
+            using (CLStoreEntities cx = new CLStoreEntities())
             {
-                var q = cx.Testers.Where(t => t.Name == name);
+                var q = cx.Operators.Where(t => t.Name == name);
                 if(!q.Any())
                 {
-                    int last_id = cx.Testers.OrderByDescending(t => t.Id).FirstOrDefault().Id;
-
-                    CLData.Tester td = new CLData.Tester();
+                    Operator td = new Operator();
                     td.Name = name;
-                    td.Active = true;
-                    td.Id = last_id + 1;
-                    td.CreateDate = DateTime.Now;
 
-                    cx.Testers.Add(td);
+                    cx.Operators.Add(td);
                     cx.SaveChanges();
                 }
                 id = q.Single().Id;

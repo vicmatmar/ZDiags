@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CLData
+namespace ZCommon
 {
     using System;
     using System.Collections.Generic;

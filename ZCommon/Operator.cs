@@ -7,17 +7,24 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CLData
+namespace ZCommon
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Tester
+    public partial class Operator
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Operator()
+        {
+            this.LowesHubs = new HashSet<LowesHub>();
+        }
+    
+        public int Id { get; set; }
         public string Name { get; set; }
         public Nullable<int> Pin { get; set; }
-        public System.DateTime CreateDate { get; set; }
-        public int Id { get; set; }
-        public bool Active { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<LowesHub> LowesHubs { get; set; }
     }
 }

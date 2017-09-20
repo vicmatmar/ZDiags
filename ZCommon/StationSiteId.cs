@@ -7,16 +7,24 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CLData
+namespace ZCommon
 {
     using System;
     using System.Collections.Generic;
     
     public partial class StationSiteId
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public StationSiteId()
+        {
+            this.LowesHubs = new HashSet<LowesHub>();
+        }
+    
         public int Id { get; set; }
         public string StationMac { get; set; }
     
         public virtual StationSite StationSite { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<LowesHub> LowesHubs { get; set; }
     }
 }

@@ -54,8 +54,11 @@ namespace ZDiags
 
         bool _zwave_updated = false;
 
+        const string _shell_prompt = "~ #";
 
-        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version, string tester="Victor Martin")
+        string _hub_ip;
+
+        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version, string tester="Victor Martin", string hub_ip_addr=null)
         {
             _dutport_name = dut_port_name;
             _bleport_name = ble_port_name;
@@ -65,6 +68,8 @@ namespace ZDiags
             _serialize_hw_version = hw_version;
 
             _tester = tester;
+
+            _hub_ip = hub_ip_addr;
 
             MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Block_Start;
             MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Block_End;
@@ -119,6 +124,12 @@ namespace ZDiags
                 }
             }
 
+            if(_hub_ip != null && _hub_ip != "")
+            {
+                fire_status("Set Hub IP to " + _hub_ip);
+                string data = setHubIpAddr(_hub_ip);
+                fire_status(data);
+            }
 
             fire_status("ZWave Update...");
             ZWaveUpdate();
@@ -166,6 +177,33 @@ namespace ZDiags
             fire_status(tmsg);
         }
 
+        string setHubIpAddr(string ipaddr, string adapter="eth0", string netmask="255.255.0.0")
+        {
+            string data;
+            using (SerialCOM dutport = getDUTPort())
+            {
+                // Make sure we can talk to hub
+                dutport.WriteWait("", "#", 3);
+
+                enterShell(dutport);
+
+                try
+                {
+                    string cmd = string.Format("ifconfig {0} {1} netmask {2}", adapter, ipaddr, netmask);
+                    dutport.WriteWait(cmd, Regex.Escape(cmd) + ".*" + _shell_prompt, timeout_sec: 3, isRegx: true);
+
+                    cmd = "ifconfig";
+                    data = dutport.WriteWait(cmd, Regex.Escape(cmd) + ".*" + _shell_prompt, timeout_sec: 3, isRegx: true);
+
+                }
+                finally
+                {
+                    exitShell(dutport);
+                }
+            }
+
+            return data;
+        }
 
         public void ShowMfg()
         {
@@ -356,7 +394,7 @@ namespace ZDiags
                     fire_status(string.Format("Buzzer Voltage: {0}", val.ToString("f2")));
                     if (val > expval)
                         break;
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                 }
                 if (val > 3.0)
                 {
@@ -376,10 +414,6 @@ namespace ZDiags
                 led_test(Sensors.GREEN_LIGHT, p.LED_Green_Off_Val, p.LED_Green_On_Val, "green");
                 led_test(Sensors.RED_LIGHT, p.LED_Red_Off_Val, p.LED_Red_On_Val, "red");
                 led_test(Sensors.YELLOW_LIGHT, p.LED_Yellow_Off_Val, p.LED_Yellow_On_Val, "yellow");
-                //led_test(Sensors.GREEN_LIGHT, 0.8, 1.2, "green");
-                //led_test(Sensors.RED_LIGHT, 3.8, 4.5, "red");
-                //led_test(Sensors.YELLOW_LIGHT, 2.8, 3.8, "yellow");
-
 
                 // Other tests
                 fire_status("Other Built-in Tests...");
@@ -423,22 +457,38 @@ namespace ZDiags
 
         public void Serialize()
         {
-            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
+            using (CLStoreEntities cx = new CLStoreEntities())
             using (SerialCOM port = getDUTPort())
             {
+                LowesHub loweshub_data = new LowesHub();
+
                 // Gather info to serialize hub
                 int production_site_id = MACAddrUtils.ProductionSiteId();
-                int test_station_id = MACAddrUtils.StationSiteId();
+                while (production_site_id > byte.MaxValue)
+                    production_site_id = production_site_id >> 1;
 
-                int tester_id = DataUtils.TesterId(_tester);
+                int test_station_id = MACAddrUtils.StationSiteId();
+                loweshub_data.test_station_id = test_station_id;
+                while (test_station_id > byte.MaxValue)
+                    test_station_id = test_station_id >> 1;
+
+                int hw_ver = _serialize_hw_version;
+                loweshub_data.hw_ver = _serialize_hw_version;
+                while (hw_ver > byte.MaxValue)
+                    hw_ver = hw_ver >> 1;
+
+                int operator_id = DataUtils.OperatorId(_tester);
+                loweshub_data.operator_id = operator_id;
+                while (operator_id > short.MaxValue)
+                    operator_id = operator_id >> 1;
 
                 _lowes_serial = LowesSerial.GetSerial(
                         model: LowesSerial.Model.IH200,
-                        hw_version: (byte)_serialize_hw_version,
+                        hw_version: (byte)hw_ver,
                         datetime: DateTime.Now,
                         factory: (byte)production_site_id,
                         test_station: (byte)test_station_id,
-                        tester: (short)tester_id);
+                        tester: (short)operator_id);
 
                 // Make sure we can talk to hub
                 port.WriteLine();
@@ -452,7 +502,7 @@ namespace ZDiags
                 if (hubsq.Any())
                 {
                     var hubs = hubsq.ToArray();
-                    foreach (CLData.LowesHub hub in hubs)
+                    foreach (LowesHub hub in hubs)
                     {
                         long hubmac = hub.MacAddress.MAC;
                         if (MACAddrUtils.Inrange(hubmac))
@@ -491,20 +541,15 @@ namespace ZDiags
                 fire_status("Hub ID: " + hubid);
 
                 // Insert the hub
-                CLData.LowesHub lh = new CLData.LowesHub();
-                lh.customer_id = customer_id;
-                lh.hw_ver = _serialize_hw_version;
-                lh.mac_id = mac_id;
-                lh.smt_serial = _smt_serial.ToString();
-                lh.lowes_serial = Lowes_Serial;
-                lh.hub_id = hubid;
+                loweshub_data.customer_id = customer_id;
+                loweshub_data.mac_id = mac_id;
+                loweshub_data.smt_serial = _smt_serial.ToString();
+                loweshub_data.lowes_serial = Lowes_Serial;
+                loweshub_data.hub_id = hubid;
 
-                cx.LowesHubs.Add(lh);
+                cx.LowesHubs.Add(loweshub_data);
                 cx.SaveChanges();
-
-
             }
-
         }
 
         void login(SerialCOM port)

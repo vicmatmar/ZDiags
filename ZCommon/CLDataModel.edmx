@@ -24,6 +24,8 @@
           <Property Name="date" Type="datetime" Nullable="false" StoreGeneratedPattern="Computed" />
           <Property Name="lowes_serial" Type="bigint" Nullable="false" />
           <Property Name="hub_id" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="operator_id" Type="int" />
+          <Property Name="test_station_id" Type="int" />
         </EntityType>
         <EntityType Name="MacAddress">
           <Key>
@@ -32,6 +34,14 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="MAC" Type="bigint" Nullable="false" />
           <Property Name="Date" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Operators">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nchar" MaxLength="250" Nullable="false" />
+          <Property Name="Pin" Type="int" />
         </EntityType>
         <EntityType Name="StationSite">
           <Key>
@@ -46,16 +56,6 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="StationMac" Type="char" MaxLength="12" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Tester">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Name" Type="nvarchar" MaxLength="250" Nullable="false" />
-          <Property Name="Pin" Type="int" />
-          <Property Name="CreateDate" Type="datetime" Nullable="false" />
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="Active" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK_LowesCustomersLowesHubs">
           <End Role="LowesCustomers" Type="Self.LowesCustomers" Multiplicity="1" />
@@ -81,6 +81,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_LowesHubs_Operator">
+          <End Role="Operators" Type="Self.Operators" Multiplicity="0..1" />
+          <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Operators">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHubs">
+              <PropertyRef Name="operator_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LowesHubs_Station">
+          <End Role="StationSiteId" Type="Self.StationSiteId" Multiplicity="0..1" />
+          <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StationSiteId">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHubs">
+              <PropertyRef Name="test_station_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_StationMac_ToTable">
           <End Role="StationSite" Type="Self.StationSite" Multiplicity="1" />
           <End Role="StationSiteId" Type="Self.StationSiteId" Multiplicity="*" />
@@ -102,15 +126,23 @@
           <EntitySet Name="LowesCustomers" EntityType="Self.LowesCustomers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LowesHubs" EntityType="Self.LowesHubs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MacAddress" EntityType="Self.MacAddress" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Operators" EntityType="Self.Operators" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StationSite" EntityType="Self.StationSite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StationSiteId" EntityType="Self.StationSiteId" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Tester" EntityType="Self.Tester" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_LowesCustomersLowesHubs" Association="Self.FK_LowesCustomersLowesHubs">
             <End Role="LowesCustomers" EntitySet="LowesCustomers" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
           </AssociationSet>
           <AssociationSet Name="FK_LowesHubs_MacAddress" Association="Self.FK_LowesHubs_MacAddress">
             <End Role="MacAddress" EntitySet="MacAddress" />
+            <End Role="LowesHubs" EntitySet="LowesHubs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LowesHubs_Operator" Association="Self.FK_LowesHubs_Operator">
+            <End Role="Operators" EntitySet="Operators" />
+            <End Role="LowesHubs" EntitySet="LowesHubs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LowesHubs_Station" Association="Self.FK_LowesHubs_Station">
+            <End Role="StationSiteId" EntitySet="StationSiteId" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
           </AssociationSet>
           <AssociationSet Name="FK_StationMac_ToTable" Association="Self.FK_StationMac_ToTable">
@@ -145,7 +177,15 @@
             <End Role="StationSite" EntitySet="StationSites" />
             <End Role="StationSiteId" EntitySet="StationSiteIds" />
           </AssociationSet>
-          <EntitySet Name="Testers" EntityType="CLStoreModel.Tester" />
+          <EntitySet Name="Operators" EntityType="CLStoreModel.Operator" />
+          <AssociationSet Name="FK_LowesHubs_Operator" Association="CLStoreModel.FK_LowesHubs_Operator">
+            <End Role="Operator" EntitySet="Operators" />
+            <End Role="LowesHub" EntitySet="LowesHubs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LowesHubs_Station" Association="CLStoreModel.FK_LowesHubs_Station">
+            <End Role="StationSiteId" EntitySet="StationSiteIds" />
+            <End Role="LowesHub" EntitySet="LowesHubs" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="LowesCustomer">
           <Key>
@@ -169,6 +209,10 @@
           <NavigationProperty Name="MacAddress" Relationship="CLStoreModel.FK_LowesHubs_MacAddress" FromRole="LowesHub" ToRole="MacAddress" />
           <Property Name="lowes_serial" Type="Int64" Nullable="false" />
           <Property Name="hub_id" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="operator_id" Type="Int32" />
+          <NavigationProperty Name="Operator" Relationship="CLStoreModel.FK_LowesHubs_Operator" FromRole="LowesHub" ToRole="Operator" />
+          <Property Name="test_station_id" Type="Int32" />
+          <NavigationProperty Name="StationSiteId" Relationship="CLStoreModel.FK_LowesHubs_Station" FromRole="LowesHub" ToRole="StationSiteId" />
         </EntityType>
         <EntityType Name="MacAddress">
           <Key>
@@ -218,6 +262,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="StationMac" Type="String" Nullable="false" MaxLength="12" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="StationSite" Relationship="CLStoreModel.FK_StationMac_ToTable" FromRole="StationSiteId" ToRole="StationSite" />
+          <NavigationProperty Name="LowesHubs" Relationship="CLStoreModel.FK_LowesHubs_Station" FromRole="StationSiteId" ToRole="LowesHub" />
         </EntityType>
         <Association Name="FK_StationMac_ToTable">
           <End Type="CLStoreModel.StationSite" Role="StationSite" Multiplicity="1" />
@@ -231,16 +276,39 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Tester">
+        <EntityType Name="Operator">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="250" FixedLength="true" Unicode="true" />
           <Property Name="Pin" Type="Int32" />
-          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="LowesHubs" Relationship="CLStoreModel.FK_LowesHubs_Operator" FromRole="Operator" ToRole="LowesHub" />
         </EntityType>
+        <Association Name="FK_LowesHubs_Operator">
+          <End Type="CLStoreModel.Operator" Role="Operator" Multiplicity="0..1" />
+          <End Type="CLStoreModel.LowesHub" Role="LowesHub" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Operator">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHub">
+              <PropertyRef Name="operator_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LowesHubs_Station">
+          <End Type="CLStoreModel.StationSiteId" Role="StationSiteId" Multiplicity="0..1" />
+          <End Type="CLStoreModel.LowesHub" Role="LowesHub" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StationSiteId">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LowesHub">
+              <PropertyRef Name="test_station_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -259,6 +327,8 @@
           <EntitySetMapping Name="LowesHubs">
             <EntityTypeMapping TypeName="CLStoreModel.LowesHub">
               <MappingFragment StoreEntitySet="LowesHubs">
+                <ScalarProperty Name="test_station_id" ColumnName="test_station_id" />
+                <ScalarProperty Name="operator_id" ColumnName="operator_id" />
                 <ScalarProperty Name="hub_id" ColumnName="hub_id" />
                 <ScalarProperty Name="lowes_serial" ColumnName="lowes_serial" />
                 <ScalarProperty Name="date" ColumnName="date" />
@@ -295,14 +365,12 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Testers">
-            <EntityTypeMapping TypeName="CLStoreModel.Tester">
-              <MappingFragment StoreEntitySet="Tester">
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+          <EntitySetMapping Name="Operators">
+            <EntityTypeMapping TypeName="CLStoreModel.Operator">
+              <MappingFragment StoreEntitySet="Operators">
                 <ScalarProperty Name="Pin" ColumnName="Pin" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -27,10 +27,10 @@ namespace ZDiags
             HelpText = "SMT Serial")]
         public string smt_serial { get; set; }
 
-        [Option("customer_IRIS", Required = false, MutuallyExclusiveSet ="custumer",
+        [Option("customer_IRIS", Required = false, MutuallyExclusiveSet ="customer",
             HelpText = "Specifies IRIS as custumer")]
         public bool Custumer_IRIS { get; set; }
-        [Option("customer_Amazone", Required = false, MutuallyExclusiveSet = "custumer",
+        [Option("customer_Amazone", Required = false, MutuallyExclusiveSet = "customer",
             HelpText = "Specifies Amazone as custumer")]
         public bool Custumer_Amazone { get; set; }
 
@@ -41,6 +41,10 @@ namespace ZDiags
         [Option("tester", Required = true, 
             HelpText = "Tester Name LastName")]
         public string Tester { get; set; }
+
+        [Option("hub_ip_addr", Required = false,
+            HelpText = "IP to assigned to hub")]
+        public string Hub_IP { get; set; }
 
     }
 }

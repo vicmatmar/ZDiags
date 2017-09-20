@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CLData
+namespace ZCommon
 {
     using System;
     using System.Data.Entity;
@@ -32,7 +32,7 @@ namespace CLData
         public virtual DbSet<MacAddress> MacAddresses { get; set; }
         public virtual DbSet<StationSite> StationSites { get; set; }
         public virtual DbSet<StationSiteId> StationSiteIds { get; set; }
-        public virtual DbSet<Tester> Testers { get; set; }
+        public virtual DbSet<Operator> Operators { get; set; }
     
         public virtual int GetNextMac(Nullable<long> startBlock, Nullable<long> endBlock, ObjectParameter newMac)
         {

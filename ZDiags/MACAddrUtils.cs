@@ -40,7 +40,7 @@ namespace ZDiags
         public static long GetNewMac()
         {
             long mac_out = INVALID_MAC;
-            using (CLData.CLStoreEntities context = new CLData.CLStoreEntities())
+            using (CLStoreEntities context = new CLStoreEntities())
             {
                 ObjectParameter newmac = new ObjectParameter("newmac", typeof(long));
                 //try
@@ -72,7 +72,7 @@ namespace ZDiags
         public static int GetMacId(long mac)
         {
             int id = INVALID_ID;
-            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
+            using (CLStoreEntities cx = new CLStoreEntities())
             {
                 var q = cx.MacAddresses.Where(m => m.MAC == mac);
                 if (q.Any())
@@ -104,7 +104,7 @@ namespace ZDiags
 
         public static void DeleteBlock()
         {
-            using (CLData.CLStoreEntities context = new CLData.CLStoreEntities())
+            using (CLStoreEntities context = new CLStoreEntities())
             {
                 var addrs = context.MacAddresses.Where(m => m.MAC >= BlockStartAddr && m.MAC < BlockEndAddr);
                 context.MacAddresses.RemoveRange(addrs);
@@ -133,7 +133,7 @@ namespace ZDiags
 
         public static int ProductionSiteId()
         {
-            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
+            using (CLStoreEntities cx = new CLStoreEntities())
             {
                 foreach (string mac in StationMACS)
                 {
@@ -150,7 +150,7 @@ namespace ZDiags
 
         public static int StationSiteId()
         {
-            using (CLData.CLStoreEntities cx = new CLData.CLStoreEntities())
+            using (CLStoreEntities cx = new CLStoreEntities())
             {
                 foreach (string mac in StationMACS)
                 {
@@ -164,7 +164,7 @@ namespace ZDiags
                         // Add if this MAC is in the StationSite table
                         if(cx.StationSites.Where(s=>s.StationMac == mac).Any())
                         {
-                            CLData.StationSiteId si = new CLData.StationSiteId();
+                            StationSiteId si = new StationSiteId();
                             si.StationMac = mac;
 
                             cx.StationSiteIds.Add(si);

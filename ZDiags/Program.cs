@@ -63,8 +63,8 @@ namespace ZDiags
             Console.WriteLine("Custumer: " + customer.ToString());
             Console.WriteLine("HW Version: " + options.HW_Version);
 
-            string tester = DataUtils.TesterName(options.Tester);
-            int tester_id = DataUtils.TesterId(tester);
+            string tester = DataUtils.OperatorName(options.Tester);
+            int tester_id = DataUtils.OperatorId(tester);
             Console.WriteLine("Tester: " + tester);
             Console.WriteLine();
 
@@ -79,7 +79,8 @@ namespace ZDiags
                         smt_serial: options.smt_serial, 
                         customer: customer, 
                         hw_version: options.HW_Version,
-                        tester: tester
+                        tester: tester,
+                        hub_ip_addr: options.Hub_IP
                     )
                 )
                 {
@@ -118,6 +119,7 @@ namespace ZDiags
                     var exd = (System.Data.Entity.Infrastructure.DbUpdateException)ex;
                     Console.WriteLine(exd.InnerException.InnerException.Message);
                 }
+
 
 
                 return -1;
