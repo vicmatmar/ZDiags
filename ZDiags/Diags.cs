@@ -29,7 +29,7 @@ namespace ZDiags
         Customer _custumer;
 
         string _serialize_model = "IH200";
-        char _serialize_hw_version = '4';
+        int _serialize_hw_version = 3;
 
         string _tester;
 
@@ -58,7 +58,7 @@ namespace ZDiags
 
         string _hub_ip;
 
-        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, char hw_version, string tester="Victor Martin", string hub_ip_addr=null)
+        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, int hw_version, string tester="Victor Martin", string hub_ip_addr=null)
         {
             _dutport_name = dut_port_name;
             _bleport_name = ble_port_name;

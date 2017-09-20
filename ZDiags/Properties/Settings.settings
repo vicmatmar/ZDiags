@@ -24,7 +24,7 @@
       <Value Profile="(Default)">3.8</Value>
     </Setting>
     <Setting Name="LED_Yellow_On_Val" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">3.8</Value>
+      <Value Profile="(Default)">3.9</Value>
     </Setting>
     <Setting Name="LED_Yellow_Off_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">2.8</Value>
