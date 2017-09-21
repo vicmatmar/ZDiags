@@ -56,7 +56,7 @@ namespace ZDiags
             Console.WriteLine(propname.ToUpper() + ": " + valuestr);
             string com_ble = valuestr;
 
-            Console.WriteLine("SMT Serial: " + options.smt_serial);
+            Console.WriteLine("SMT Serial: " + options.SMT_Serial);
             Diags.Customer customer = Diags.Customer.IRIS; ;
             if (options.Custumer_Amazone)
                 customer = Diags.Customer.Amazone;
@@ -76,7 +76,7 @@ namespace ZDiags
                     Diags diags = new Diags
                     (
                         dut_port_name: com_dut, ble_port_name: com_ble,
-                        smt_serial: options.smt_serial, 
+                        smt_serial: options.SMT_Serial, 
                         customer: customer, 
                         hw_version: options.HW_Version,
                         tester: tester,

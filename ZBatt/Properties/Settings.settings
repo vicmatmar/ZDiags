@@ -20,5 +20,8 @@
     <Setting Name="LED_Yellow_Off_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.001</Value>
     </Setting>
+    <Setting Name="Log_Folder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LogsBatt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

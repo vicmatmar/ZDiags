@@ -42,8 +42,8 @@ namespace ZBatt
         {
             uint[] linemums = get_linenums();
             double[] values = NIUtils.Read_MultiAi(linemums);
-            for (int i = 0; i < linemums.Length; i++)
-                _leds[i].LastValue = values[i];
+            //for (int i = 0; i < linemums.Length; i++)
+            //    _leds[i].LastValue = values[i];
 
             return values;
         }
@@ -99,17 +99,19 @@ namespace ZBatt
         double _on_val = double.MaxValue;
         public double OnVal { get { return _on_val; } set { _on_val = value; } }
 
-        double _mid_val_point;
 
         const string _fs_control_path_fmt = "/sys/class/leds/{0}/brightness";
         string _color_name;
         public string ColorName { get { return _color_name; } set { _color_name = value; } }
 
-        double _max_value = double.MinValue;
-        public double MaxValue { get { return _max_value; } }
-
         double _min_value = double.MaxValue;
         public double MinValue { get { return _min_value; } }
+
+        double _mid_value;
+        public double MidValue { get { return _mid_value; } }
+
+        double _max_value = double.MinValue;
+        public double MaxValue { get { return _max_value; } }
 
 
         public LED(uint ai, double off_val, double on_val, string color_name = null)
@@ -121,7 +123,7 @@ namespace ZBatt
 
             if (_off_val >= _on_val)
                 throw new Exception("on value should be greater than off value");
-            _mid_val_point = (_on_val - _off_val) / 2 + off_val;
+            _mid_value = (_on_val - _off_val) / 2 + off_val;
 
             _color_name = color_name;
         }
@@ -187,7 +189,7 @@ namespace ZBatt
 
         public bool getIsOn(double value)
         {
-            if (value > _mid_val_point)
+            if (value > _mid_value)
                 return true;
             else
                 return false;
@@ -201,7 +203,7 @@ namespace ZBatt
         {
             get
             {
-                if (Value > _mid_val_point)
+                if (Value > _mid_value)
                     return true;
                 else
                     return false;

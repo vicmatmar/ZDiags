@@ -73,58 +73,68 @@ namespace ZBatt
                 return -1;
             }
 
+            Console.WriteLine("SMT Serial: " + options.SMT_Serial);
+            Console.WriteLine("Host: " + options.Host);
+            Console.WriteLine();
+
+
             if (options.CalibrateLEDs)
             {
 
-                BatteryTest batcal = new BatteryTest(options.Host);
-                double[] values = batcal.GetLEDsValues();
-                int i = 0;
+                BatteryTest batcal = new BatteryTest(options.Host, options.SMT_Serial);
 
-                _log.InfoFormat("Red On   : {0}", values[i++].ToString("G2"));
+                char save_option = 'n';
+                while (true)
+                {
+                    Console.WriteLine("Getting LEDs values...\r\n");
+                    double[] values = batcal.GetLEDsValues();
+                    int i = 0;
 
-                Console.WriteLine("Red On   : {0}", values[i++].ToString("G2"));
-                Console.WriteLine("Green On : {0}", values[i++].ToString("G2"));
-                Console.WriteLine("Yellow On: {0}", values[i++].ToString("G2"));
+                    Console.WriteLine("Red On   : {0}", values[i++].ToString("G2"));
+                    Console.WriteLine("Green On : {0}", values[i++].ToString("G2"));
+                    Console.WriteLine("Yellow On: {0}", values[i++].ToString("G2"));
 
-                Console.WriteLine();
+                    Console.WriteLine();
 
-                Console.WriteLine("Red Off   : {0}", values[i++].ToString("G2"));
-                Console.WriteLine("Green Off : {0}", values[i++].ToString("G2"));
-                Console.WriteLine("Yellow Off: {0}", values[i++].ToString("G2"));
+                    Console.WriteLine("Red Off   : {0}", values[i++].ToString("G2"));
+                    Console.WriteLine("Green Off : {0}", values[i++].ToString("G2"));
+                    Console.WriteLine("Yellow Off: {0}", values[i++].ToString("G2"));
 
-                i = 0;
-                Properties.Settings.Default.LED_Red_On_Val = values[i++];
-                Properties.Settings.Default.LED_Green_On_Val = values[i++];
-                Properties.Settings.Default.LED_Yellow_On_Val = values[i++];
+                    i = 0;
+                    Properties.Settings.Default.LED_Red_On_Val = values[i++];
+                    Properties.Settings.Default.LED_Green_On_Val = values[i++];
+                    Properties.Settings.Default.LED_Yellow_On_Val = values[i++];
 
-                Properties.Settings.Default.LED_Red_Off_Val = values[i++];
-                Properties.Settings.Default.LED_Green_Off_Val = values[i++];
-                Properties.Settings.Default.LED_Yellow_Off_Val = values[i++];
+                    Properties.Settings.Default.LED_Red_Off_Val = values[i++];
+                    Properties.Settings.Default.LED_Green_Off_Val = values[i++];
+                    Properties.Settings.Default.LED_Yellow_Off_Val = values[i++];
 
-                Properties.Settings.Default.Save();
+                    Console.WriteLine("Save Values? (y/n/r):");
+                    save_option = Convert.ToChar(Console.Read());
+                    if (save_option != 'r')
+                        break;
+                }
+                if (save_option == 'y')
+                    Properties.Settings.Default.Save();
             }
 
             try
             {
-                BatteryTest battery_test = new BatteryTest(options.Host);
+                BatteryTest battery_test = new BatteryTest(options.Host, options.SMT_Serial);
                 battery_test.Status_Event += Battery_test_Status_Event;
-                battery_test.LEDTestEnabled = false;
+                battery_test.LogFolder = Properties.Settings.Default.Log_Folder;
+                Directory.CreateDirectory(battery_test.LogFolder);
 
-                battery_test.LEDTestEnabled = !options.DisableLEDTest;
-                if (battery_test.LEDTestEnabled)
-                {
-                    battery_test.LED_Red.OnVal = Properties.Settings.Default.LED_Red_On_Val;
-                    battery_test.LED_Red.OffVal = Properties.Settings.Default.LED_Red_Off_Val;
-                    battery_test.LED_Green.OnVal = Properties.Settings.Default.LED_Green_On_Val;
-                    battery_test.LED_Green.OffVal = Properties.Settings.Default.LED_Green_Off_Val;
-                    battery_test.LED_Yellow.OnVal = Properties.Settings.Default.LED_Yellow_On_Val;
-                    battery_test.LED_Yellow.OffVal = Properties.Settings.Default.LED_Yellow_Off_Val;
-                }
+                battery_test.LED_Red.OnVal = Properties.Settings.Default.LED_Red_On_Val;
+                battery_test.LED_Red.OffVal = Properties.Settings.Default.LED_Red_Off_Val;
+                battery_test.LED_Green.OnVal = Properties.Settings.Default.LED_Green_On_Val;
+                battery_test.LED_Green.OffVal = Properties.Settings.Default.LED_Green_Off_Val;
+                battery_test.LED_Yellow.OnVal = Properties.Settings.Default.LED_Yellow_On_Val;
+                battery_test.LED_Yellow.OffVal = Properties.Settings.Default.LED_Yellow_Off_Val;
 
                 battery_test.InvalidateEnabled = !options.DisableInvalidate;
 
                 battery_test.Run();
-
 
             }
             catch (Exception ex)
@@ -151,7 +161,7 @@ namespace ZBatt
         {
             //string msg = string.Format("{0:G}: {1}", DateTime.Now, status_txt);
             //Console.WriteLine(msg);
-            switch(status_level)
+            switch (status_level)
             {
                 case BatteryTest.Status_Level.Info:
                     _log.Info(status_txt);

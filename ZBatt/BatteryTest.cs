@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Text.RegularExpressions;
 using ZCommon;
+using System.IO;
+
 
 namespace ZBatt
 {
@@ -24,9 +26,6 @@ namespace ZBatt
         public LED LED_Yellow { get { return _yellow_led; } }
 
 
-        bool _led_test_enabled = false;
-        public bool LEDTestEnabled { get { return _led_test_enabled; } set { _led_test_enabled = value; } }
-
         bool _invalidate_enabled = false;
         public bool InvalidateEnabled { get { return _invalidate_enabled; } set { _invalidate_enabled = value; } }
 
@@ -39,9 +38,16 @@ namespace ZBatt
 
         const string _ssh_prompt = "#";
 
-        public BatteryTest(string host)
+        string _log_folder = "";
+        public string LogFolder { get { return _log_folder; } set { _log_folder = value; } }
+
+        string _smt_serial;
+
+
+        public BatteryTest(string host, string smt_serial)
         {
             _host = host;
+            _smt_serial = smt_serial;
 
             _red_led = new LED((uint)BatteryJig.Sensors.RED_LIGHT, 0.25, 0.5, "red");
             _green_led = new LED((uint)BatteryJig.Sensors.GREEN_LIGHT, 0.001, 0.06, "green");
@@ -75,12 +81,9 @@ namespace ZBatt
             Thread.Sleep(1000);
 
 
+            fire_status("LED Boot Test...");
             DateTime start = DateTime.Now;
-            if (LEDTestEnabled)
-            {
-                fire_status("LED Boot Test...");
-                LEDBootPatternTest();
-            }
+            LEDBootPatternTest();
             TimeSpan ts_total = DateTime.Now - start;
             int ts_towait = 4000 - (int)ts_total.TotalSeconds * 1000;
             if (ts_towait > 0)
@@ -144,9 +147,9 @@ namespace ZBatt
                     fire_status(data, Status_Level.Debug);
 
                     fire_status("Invalidate...");
-
                     //# boot invalidate
                     //Current partition has been invalidated!
+                    ssh.WriteWait("boot invalidate", "Current partition has been invalidated!", 5);
 
                     fire_status("Reboot");
                     ssh.WriteWait("reboot", "The system is going down for reboot NOW");
@@ -154,7 +157,9 @@ namespace ZBatt
                     Thread.Sleep(5000);
 
                     // Check for the boot LED pattern until it fails
+                    fire_status("Wait for LED Boot pattern...");
                     LEDBootPatternTest();
+                    fire_status("Wait for LED Boot pattern to change...");
                     start = DateTime.Now;
                     TimeSpan ts;
                     while (true)
@@ -175,15 +180,19 @@ namespace ZBatt
                     }
                     ts = DateTime.Now - start;
                     // The LED patter should have changed
+                    fire_status("LED pattern change detected after " + ts.Seconds + " seconds.");
 
+                    fire_status("Wait for LED Inavlidated pattern...");
                     LEDInvalidatedPatternTest();
 
                     // Check our connection is not good anymore
+                    fire_status("Test for not connected");
                     if (ssh.IsConnected)
                         throw new Exception("Our ssh is still connected. Are you sure the hub rebootted?");
 
                     // Now try to connect
                     // It should not let os
+                    fire_status("Test connecting is not possible");
                     try
                     {
                         ssh.Connect();
@@ -206,6 +215,8 @@ namespace ZBatt
                     //reboot
                 }
 
+                SaveShowMfg(ssh);
+
             }
             catch
             {
@@ -217,13 +228,36 @@ namespace ZBatt
             }
         }
 
+        public void SaveShowMfg(SSHUtil ssh)
+        {
+            // Make sure we can talk to hub
+            ssh.WriteWait("", "#", 3);
+            ssh.Data = "";
+            string mfg_data = ssh.WriteWait("show mfg", "Batch Number:", 3);
+
+            fire_status("SMT_Number: " + _smt_serial);
+            fire_status(mfg_data);
+
+            string fileloc = Path.Combine(this.LogFolder, "b" + _smt_serial.ToString() + ".txt");
+            using (FileStream fs = new FileStream(fileloc, FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                sw.WriteLine("SMT_Number: " + _smt_serial);
+
+                sw.Write(mfg_data);
+                sw.Close();
+            }
+        }
+
+
         void LEDInvalidatedPatternTest()
         {
             DateTime start = DateTime.Now;
             int detected_count = 0;
             while (true)
             {
-                if (_red_led.isOff && _yellow_led.isOn && _green_led.isOn)
+                // Only RED off, Green and Yellow stay blinking
+                if (_leds.arePattern(new bool[] { false, true, true }))
                 {
                     detected_count++;
                     Thread.Sleep(500);
@@ -249,7 +283,7 @@ namespace ZBatt
             while (true)
             {
                 //if (_red_led.isOn && _yellow_led.isOn && _green_led.isOn)
-                if(_leds.areOn)
+                if (_leds.areOn)
                 {
                     break;
                 }
@@ -257,8 +291,11 @@ namespace ZBatt
                 TimeSpan ts = DateTime.Now - start;
                 if (ts.TotalSeconds > 4)
                 {
-                    string emsg = string.Format("Not all LEDs detected ON. R:{0}, G:{1}, Y:{2}",
-                        _red_led.MaxValue.ToString("G2"), _green_led.MaxValue.ToString("G2"), _yellow_led.MaxValue.ToString("G2"));
+                    string emsg = string.Format("Not all LEDs detected ON. R:{0}({1}), G:{2}({3}), Y:{4}({5})",
+                        _red_led.MaxValue.ToString("G2"), _red_led.MidValue.ToString("G2"),
+                        _green_led.MaxValue.ToString("G2"), _green_led.MidValue.ToString("G2"),
+                        _yellow_led.MaxValue.ToString("G2"), _yellow_led.MidValue.ToString("G2"));
+
                     throw new Exception(emsg);
                 }
             }

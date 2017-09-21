@@ -73,7 +73,7 @@ namespace ZDiags.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Logs")]
+        [global::System.Configuration.DefaultSettingValueAttribute("LogDiags")]
         public string Log_Folder {
             get {
                 return ((string)(this["Log_Folder"]));

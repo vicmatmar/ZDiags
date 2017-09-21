@@ -94,5 +94,17 @@ namespace ZBatt.Properties {
                 this["LED_Yellow_Off_Val"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LogsBatt")]
+        public string Log_Folder {
+            get {
+                return ((string)(this["Log_Folder"]));
+            }
+            set {
+                this["Log_Folder"] = value;
+            }
+        }
     }
 }

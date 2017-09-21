@@ -170,7 +170,7 @@ namespace ZDiags
             Certificate();
 
             fire_status("Show Mfg...");
-            ShowMfg();
+            SaveShowMfg();
 
             TimeSpan ts = DateTime.Now - start_time;
             string tmsg = string.Format("ETime: {0}s.", ts.TotalSeconds);
@@ -205,7 +205,7 @@ namespace ZDiags
             return data;
         }
 
-        public void ShowMfg()
+        public void SaveShowMfg()
         {
             using (SerialCOM dutport = getDUTPort())
             {
@@ -216,7 +216,7 @@ namespace ZDiags
 
                 fire_status(mfg_data);
 
-                string fileloc = Path.Combine(this.LogFolder, _smt_serial.ToString() + ".txt");
+                string fileloc = Path.Combine(this.LogFolder, "d" + _smt_serial.ToString() + ".txt");
                 using (FileStream fs = new FileStream(fileloc, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (StreamWriter sw = new StreamWriter(fs))
                 {

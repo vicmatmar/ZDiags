@@ -25,7 +25,7 @@ namespace ZDiags
 
         [Option("smt_serial", Required = true,
             HelpText = "SMT Serial")]
-        public string smt_serial { get; set; }
+        public string SMT_Serial { get; set; }
 
         [Option("customer_IRIS", Required = false, MutuallyExclusiveSet ="customer",
             HelpText = "Specifies IRIS as custumer")]

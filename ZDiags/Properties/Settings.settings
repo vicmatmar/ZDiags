@@ -15,7 +15,7 @@
       <Value Profile="(Default)">97207582463</Value>
     </Setting>
     <Setting Name="Log_Folder" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Logs</Value>
+      <Value Profile="(Default)">LogDiags</Value>
     </Setting>
     <Setting Name="LED_Red_On_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">4.5</Value>
