@@ -9,6 +9,43 @@ namespace ZCommon
     public class DataUtils
     {
 
+        public static void PrintHubLabel(string hub_serial, string zplfile, string printer_addres)
+        {
+            string hub_mac;
+            string hub_id;
+
+            using (CLStoreEntities cx = new CLStoreEntities())
+            {
+                var lhs = cx.LowesHubs.Where(lh => lh.smt_serial == hub_serial).OrderByDescending(lh => lh.date).First();
+                hub_mac = lhs.MacAddress.MAC.ToString("X12");
+                hub_id = lhs.hub_id;
+            }
+
+            // get the zpl file
+            System.IO.FileStream fs_zpl = new System.IO.FileStream(zplfile, System.IO.FileMode.Open);
+            byte[] zpl_file_bytes = new byte[fs_zpl.Length];
+            fs_zpl.Read(zpl_file_bytes, 0, zpl_file_bytes.Length);
+
+            // Open connection
+            System.Net.Sockets.TcpClient client = new System.Net.Sockets.TcpClient();
+            int port = 9100;
+            client.Connect(printer_addres, port);
+
+            // Write ZPL String to connection
+            System.IO.StreamWriter writer = new System.IO.StreamWriter(client.GetStream());
+
+            object[] data = new object[3] { hub_serial, hub_mac, hub_id };
+
+            string label = string.Format(System.Text.Encoding.UTF8.GetString(zpl_file_bytes), data);
+
+            writer.Write(label);
+            writer.Flush();
+
+            // Close Connection
+            writer.Close();
+            client.Close();
+        }
+
         public static string OperatorName(string txt)
         {
             if (txt == null || txt == "")

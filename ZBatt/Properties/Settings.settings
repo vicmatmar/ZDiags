@@ -23,5 +23,11 @@
     <Setting Name="Log_Folder" Type="System.String" Scope="User">
       <Value Profile="(Default)">LogsBatt</Value>
     </Setting>
+    <Setting Name="ZPL_Lable_File" Type="System.String" Scope="User">
+      <Value Profile="(Default)">zeus.zpl</Value>
+    </Setting>
+    <Setting Name="Printer_Address" Type="System.String" Scope="User">
+      <Value Profile="(Default)">172.29.250.59</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

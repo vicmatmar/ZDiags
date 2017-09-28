@@ -120,41 +120,92 @@ namespace ZBatt
 
             try
             {
-                BatteryTest battery_test = new BatteryTest(options.Host, options.SMT_Serial);
-                battery_test.Status_Event += Battery_test_Status_Event;
-                battery_test.LogFolder = Properties.Settings.Default.Log_Folder;
-                Directory.CreateDirectory(battery_test.LogFolder);
+                if (!options.NoJigMode)
+                {
 
-                battery_test.LED_Red.OnVal = Properties.Settings.Default.LED_Red_On_Val;
-                battery_test.LED_Red.OffVal = Properties.Settings.Default.LED_Red_Off_Val;
-                battery_test.LED_Green.OnVal = Properties.Settings.Default.LED_Green_On_Val;
-                battery_test.LED_Green.OffVal = Properties.Settings.Default.LED_Green_Off_Val;
-                battery_test.LED_Yellow.OnVal = Properties.Settings.Default.LED_Yellow_On_Val;
-                battery_test.LED_Yellow.OffVal = Properties.Settings.Default.LED_Yellow_Off_Val;
+                    BatteryTest battery_test = new BatteryTest(options.Host, options.SMT_Serial);
 
-                battery_test.InvalidateEnabled = !options.DisableInvalidate;
+                    battery_test.InvalidateEnabled = !options.DisableInvalidate;
+                    battery_test.Status_Event += Battery_test_Status_Event;
 
-                battery_test.Run();
+                    battery_test.LogFolder = Properties.Settings.Default.Log_Folder;
+                    Directory.CreateDirectory(battery_test.LogFolder);
+
+                    battery_test.LED_Red.OnVal = Properties.Settings.Default.LED_Red_On_Val;
+                    battery_test.LED_Red.OffVal = Properties.Settings.Default.LED_Red_Off_Val;
+                    battery_test.LED_Green.OnVal = Properties.Settings.Default.LED_Green_On_Val;
+                    battery_test.LED_Green.OffVal = Properties.Settings.Default.LED_Green_Off_Val;
+                    battery_test.LED_Yellow.OnVal = Properties.Settings.Default.LED_Yellow_On_Val;
+                    battery_test.LED_Yellow.OffVal = Properties.Settings.Default.LED_Yellow_Off_Val;
+
+                    battery_test.Run();
+
+                }
+                else
+                {
+                    BatteryTestNoJig batery_test = new BatteryTestNoJig(options.Host, options.SMT_Serial);
+                    batery_test.InvalidateEnabled = !options.DisableInvalidate;
+
+                    batery_test.Status_Event += Baterytest_Status_Event;
+
+                    batery_test.LogFolder = Properties.Settings.Default.Log_Folder;
+                    Directory.CreateDirectory(batery_test.LogFolder);
+
+                    batery_test.Run();
+
+                }
 
             }
             catch (Exception ex)
             {
                 _log.Fatal(ex.Message + "\r\n" + ex.StackTrace);
-                //Console.WriteLine(ex.Message);
-                //Console.WriteLine();
-                //Console.WriteLine(ex.StackTrace);
-
                 return -2;
             }
             finally
             {
-                BatteryJig.Set_all_relays(false);
+
             }
 
             _log.Info("All Tests Passed");
-            //Console.WriteLine("All Tests Passed");
+
+            if (!options.PrintLabelDisabled)
+            {
+                _log.Info("Printing label...");
+                try
+                {
+                    DataUtils.PrintHubLabel(
+                        options.SMT_Serial,
+                        Properties.Settings.Default.ZPL_Lable_File,
+                        Properties.Settings.Default.Printer_Address);
+                }
+                catch (Exception ex)
+                {
+                    _log.Fatal(ex.Message + "\r\n" + ex.StackTrace);
+                    return -2;
+                }
+                finally
+                {
+
+                }
+            }
 
             return 0;
+        }
+
+        private static void Baterytest_Status_Event(object sender, string status_txt, BatteryTestNoJig.Status_Level status_level = BatteryTestNoJig.Status_Level.Info)
+        {
+            switch (status_level)
+            {
+                case BatteryTestNoJig.Status_Level.Info:
+                    _log.Info(status_txt);
+                    break;
+                case BatteryTestNoJig.Status_Level.Debug:
+                    _log.Debug(status_txt);
+                    break;
+                default:
+                    _log.Info(status_txt);
+                    break;
+            }
         }
 
         private static void Battery_test_Status_Event(object sender, string status_txt, BatteryTest.Status_Level status_level)

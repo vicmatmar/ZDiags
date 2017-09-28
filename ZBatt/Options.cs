@@ -28,6 +28,14 @@ namespace ZBatt
             HelpText = "Disables boot invalidation")]
         public bool DisableInvalidate { get; set; }
 
+        [Option("no_jig_mode", Required = false, DefaultValue = false,
+            HelpText = "Runs testd in No Jig Mode")]
+        public bool NoJigMode { get; set; }
+
+        [Option("disable_print_label", Required = false, DefaultValue = false,
+            HelpText = "Disables printing label at the end of the test")]
+        public bool PrintLabelDisabled { get; set; }
+
     }
 
 }

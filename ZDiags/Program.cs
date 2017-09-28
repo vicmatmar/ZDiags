@@ -68,6 +68,10 @@ namespace ZDiags
             Console.WriteLine("Tester: " + tester);
             Console.WriteLine();
 
+            // For debug
+            //Console.WriteLine("Press Enter to continue");
+            //Console.ReadLine();
+
             Console.WriteLine("Run Tests...");
             try
             {
@@ -119,6 +123,7 @@ namespace ZDiags
                     var exd = (System.Data.Entity.Infrastructure.DbUpdateException)ex;
                     Console.WriteLine(exd.InnerException.InnerException.Message);
                 }
+
 
 
 

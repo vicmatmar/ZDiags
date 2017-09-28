@@ -18,7 +18,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="mac_id" Type="int" Nullable="false" />
-          <Property Name="smt_serial" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="smt_serial" Type="nvarchar" MaxLength="16" Nullable="false" />
           <Property Name="hw_ver" Type="int" Nullable="false" />
           <Property Name="customer_id" Type="int" Nullable="false" />
           <Property Name="date" Type="datetime" Nullable="false" StoreGeneratedPattern="Computed" />
@@ -57,7 +57,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="StationMac" Type="char" MaxLength="12" Nullable="false" />
         </EntityType>
-        <Association Name="FK_LowesCustomersLowesHubs">
+        <Association Name="FK_LowesHubs_LowesCustomers">
           <End Role="LowesCustomers" Type="Self.LowesCustomers" Multiplicity="1" />
           <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
           <ReferentialConstraint>
@@ -69,7 +69,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_LowesHubs_MacAddress">
+        <Association Name="FK_LowesHubs_MAC">
           <End Role="MacAddress" Type="Self.MacAddress" Multiplicity="1" />
           <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
           <ReferentialConstraint>
@@ -81,7 +81,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_LowesHubs_Operator">
+        <Association Name="FK_LowesHubs_Operators">
           <End Role="Operators" Type="Self.Operators" Multiplicity="0..1" />
           <End Role="LowesHubs" Type="Self.LowesHubs" Multiplicity="*" />
           <ReferentialConstraint>
@@ -129,15 +129,15 @@
           <EntitySet Name="Operators" EntityType="Self.Operators" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StationSite" EntityType="Self.StationSite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StationSiteId" EntityType="Self.StationSiteId" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_LowesCustomersLowesHubs" Association="Self.FK_LowesCustomersLowesHubs">
+          <AssociationSet Name="FK_LowesHubs_LowesCustomers" Association="Self.FK_LowesHubs_LowesCustomers">
             <End Role="LowesCustomers" EntitySet="LowesCustomers" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
           </AssociationSet>
-          <AssociationSet Name="FK_LowesHubs_MacAddress" Association="Self.FK_LowesHubs_MacAddress">
+          <AssociationSet Name="FK_LowesHubs_MAC" Association="Self.FK_LowesHubs_MAC">
             <End Role="MacAddress" EntitySet="MacAddress" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
           </AssociationSet>
-          <AssociationSet Name="FK_LowesHubs_Operator" Association="Self.FK_LowesHubs_Operator">
+          <AssociationSet Name="FK_LowesHubs_Operators" Association="Self.FK_LowesHubs_Operators">
             <End Role="Operators" EntitySet="Operators" />
             <End Role="LowesHubs" EntitySet="LowesHubs" />
           </AssociationSet>
@@ -201,7 +201,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="mac_id" Type="Int32" Nullable="false" />
-          <Property Name="smt_serial" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="smt_serial" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
           <Property Name="hw_ver" Type="Int32" Nullable="false" />
           <Property Name="customer_id" Type="Int32" Nullable="false" />
           <Property Name="date" Type="DateTime" Nullable="false" Precision="3" annotation:StoreGeneratedPattern="Computed" />

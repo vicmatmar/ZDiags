@@ -58,7 +58,7 @@ namespace ZDiags
 
         string _hub_ip;
 
-        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, int hw_version, string tester="Victor Martin", string hub_ip_addr=null)
+        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, int hw_version, string tester = "Victor Martin", string hub_ip_addr = null)
         {
             _dutport_name = dut_port_name;
             _bleport_name = ble_port_name;
@@ -124,7 +124,7 @@ namespace ZDiags
                 }
             }
 
-            if(_hub_ip != null && _hub_ip != "")
+            if (_hub_ip != null && _hub_ip != "")
             {
                 fire_status("Set Hub IP to " + _hub_ip);
                 string data = setHubIpAddr(_hub_ip);
@@ -144,6 +144,11 @@ namespace ZDiags
             Diagnostics();
 
             fire_status("BLE Test...");
+            using (SerialCOM bleport = getBLEPort())
+            {
+                fire_status("Login to BLE");
+                login(bleport);
+            }
             int trycount = 0;
             while (true)
             {
@@ -177,7 +182,7 @@ namespace ZDiags
             fire_status(tmsg);
         }
 
-        string setHubIpAddr(string ipaddr, string adapter="eth0", string netmask="255.255.0.0")
+        string setHubIpAddr(string ipaddr, string adapter = "eth0", string netmask = "255.255.0.0")
         {
             string data;
             using (SerialCOM dutport = getDUTPort())
@@ -236,7 +241,7 @@ namespace ZDiags
                 // Make sure we can talk to hub
                 dutport.WriteWait("", "#", 3);
 
-                dutport.WriteWait("certificate " + _certificate_server, "Key install was successful", 15);
+                dutport.WriteWait("certificate " + _certificate_server + " skip_ca_check true", "Key install was successful", 15);
                 fire_status("Key install was successful");
             }
         }
@@ -432,8 +437,6 @@ namespace ZDiags
 
                 Random rand = new Random(DateTime.Now.Second);
                 int channel = rand.Next(0, 27);
-                fire_status("Login to BLE");
-                login(bleport);
                 bleport.WriteLine("ble_rx " + channel.ToString() + " 3000");
                 dutport.WriteLine("ble_tx " + channel.ToString());
                 bleport.WaitFor("Packets received:", 5, clear_data: false);
@@ -445,7 +448,8 @@ namespace ZDiags
                     throw new Exception(emsg);
                 }
                 int packets_received = Convert.ToInt32(match.Groups[1].Value);
-                if (packets_received < 1500)
+                // if (packets_received < 1500)
+                if (packets_received < 800)
                 {
                     string emsg = string.Format("BLE packets received < 1500.\r\nPackets received were: {0}", packets_received);
                     throw new Exception(emsg);
@@ -532,7 +536,7 @@ namespace ZDiags
                 string mfg_data = port.WriteWait("show mfg", "Batch Number:", 3);
                 Regex regx = new Regex(@"HubID:\s+([A-Z]+-\d+)");
                 Match m = regx.Match(mfg_data);
-                if(!m.Success || m.Groups.Count < 2)
+                if (!m.Success || m.Groups.Count < 2)
                 {
                     string emsg = string.Format("Unable to extract Hub id from data:{0}", mfg_data);
                     throw new Exception(emsg);

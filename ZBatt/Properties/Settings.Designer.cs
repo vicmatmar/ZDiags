@@ -106,5 +106,29 @@ namespace ZBatt.Properties {
                 this["Log_Folder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("zeus.zpl")]
+        public string ZPL_Lable_File {
+            get {
+                return ((string)(this["ZPL_Lable_File"]));
+            }
+            set {
+                this["ZPL_Lable_File"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("172.29.250.59")]
+        public string Printer_Address {
+            get {
+                return ((string)(this["Printer_Address"]));
+            }
+            set {
+                this["Printer_Address"] = value;
+            }
+        }
     }
 }
