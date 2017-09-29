@@ -46,5 +46,10 @@ namespace ZDiags
             HelpText = "IP to assigned to hub")]
         public string Hub_IP { get; set; }
 
+        [Option("ble_test_disabled", Required = false, DefaultValue = false,
+                HelpText = "Disables BLE test")]
+        public bool BLETestDisabeld { get; set; }
+
+
     }
 }

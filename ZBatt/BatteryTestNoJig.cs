@@ -75,7 +75,7 @@ namespace ZBatt
 
                 try
                 {
-                    data = ssh.WriteWait(cmd, outputcheck, 1);
+                    data = ssh.WriteWait(cmd, outputcheck, 2);
                     _check_bat_voltage = true;
 
                 }
@@ -152,6 +152,8 @@ namespace ZBatt
                     fire_status(outputcheck);
                 }
 
+                SaveShowMfg(ssh);
+
                 if (InvalidateEnabled)
                 {
                     fire_status("Clean up...");
@@ -159,7 +161,7 @@ namespace ZBatt
                     fire_status(data, Status_Level.Debug);
 
                     fire_status("Invalidate...");
-                    //ssh.WriteWait("boot invalidate", "Current partition has been invalidated!", 5);
+                    ssh.WriteWait("boot invalidate", "Current partition has been invalidated!", 5);
 
                     fire_status("Rebooting");
                     ssh.WriteWait("reboot", "The system is going down for reboot NOW");
@@ -206,8 +208,6 @@ namespace ZBatt
                     //# Remove jumper
                     //reboot
                 }
-
-                SaveShowMfg(ssh);
 
             }
             catch

@@ -96,7 +96,7 @@ namespace ZDiags
                     diags.Status_Event += Diags_Status_Event;
                     diags.Program_Radios = options.Program_Radios;
 
-                    //diags.Serialize();
+                    diags.BLETestDisable = options.BLETestDisabeld;
 
                     diags.Run();
                 }

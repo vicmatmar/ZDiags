@@ -58,6 +58,9 @@ namespace ZDiags
 
         string _hub_ip;
 
+        bool _ble_test_disabled = false;
+        public bool BLETestDisable { get { return _ble_test_disabled; } set { _ble_test_disabled = value; } }
+
         public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, int hw_version, string tester = "Victor Martin", string hub_ip_addr = null)
         {
             _dutport_name = dut_port_name;
@@ -143,28 +146,36 @@ namespace ZDiags
             fire_status("Diagnostics...");
             Diagnostics();
 
-            fire_status("BLE Test...");
-            using (SerialCOM bleport = getBLEPort())
+            if (BLETestDisable)
             {
-                fire_status("Login to BLE");
-                login(bleport);
-            }
-            int trycount = 0;
-            while (true)
-            {
-                try
-                {
-                    BLETest();
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    string msg = ex.Message;
-                    if (!msg.Contains("BLE packets received"))
-                        throw;
+                fire_status("BLE Test DISABLED!!!");
 
-                    if (trycount++ > 3)
-                        throw;
+            }
+            else
+            {
+                fire_status("BLE Test...");
+                using (SerialCOM bleport = getBLEPort())
+                {
+                    fire_status("Login to BLE");
+                    login(bleport);
+                }
+                int trycount = 0;
+                while (true)
+                {
+                    try
+                    {
+                        BLETest();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string msg = ex.Message;
+                        if (!msg.Contains("BLE packets received"))
+                            throw;
+
+                        if (trycount++ > 3)
+                            throw;
+                    }
                 }
             }
 
