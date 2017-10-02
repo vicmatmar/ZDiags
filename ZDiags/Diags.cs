@@ -119,9 +119,12 @@ namespace ZDiags
                 if (Program_Radios)
                 {
                     fire_status("Program Radios");
+                    dutport.Data = "";
                     DateTime t1 = DateTime.Now;
                     dutport.WriteLine("program_radios");
-                    dutport.WaitFor("Radio programming is complete.", Program_Radios_Timeout_Sec);
+                    string data = dutport.WaitFor("Radio programming is complete.", Program_Radios_Timeout_Sec);
+                    if (data.Contains("Error"))
+                        throw new Exception("Errors detected during program radios.\r\nOutput was:\r\n" + data);
                     TimeSpan ts1 = DateTime.Now - t1;
                     fire_status("Radio programming is complete after " + ts1.TotalSeconds.ToString() + "sec");
                 }

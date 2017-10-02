@@ -109,7 +109,7 @@ namespace ZDiags.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.9")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.3")]
         public double LED_Yellow_On_Val {
             get {
                 return ((double)(this["LED_Yellow_On_Val"]));
@@ -133,7 +133,7 @@ namespace ZDiags.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.79")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.8")]
         public double LED_Green_On_Val {
             get {
                 return ((double)(this["LED_Green_On_Val"]));
