@@ -58,7 +58,7 @@ Example:
             serial |= ((long)hw_version << shiftby);
 
             shiftby -= 4;
-            serial |= ((long)(datetime.Date.Month) << shiftby);
+            serial |= ((long)(datetime.Date.Month-1) << shiftby);
 
             shiftby -= 5;
             serial |= ((long)(datetime.Date.Day) << shiftby);

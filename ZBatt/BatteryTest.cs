@@ -140,6 +140,8 @@ namespace ZBatt
                     throw new Exception(msg);
                 }
 
+                SaveShowMfg(ssh);
+
                 if (InvalidateEnabled)
                 {
                     fire_status("Clean up...");
@@ -215,8 +217,6 @@ namespace ZBatt
                     //reboot
                 }
 
-                SaveShowMfg(ssh);
-
             }
             catch
             {
@@ -254,17 +254,40 @@ namespace ZBatt
         {
             DateTime start = DateTime.Now;
             int detected_count = 0;
+
+
+            bool red_off_detected = false;
+            bool green_on_detected = false;
+            bool yellow_on_detected = false;
             while (true)
             {
-                // Only RED off, Green and Yellow stay blinking
-                if (_leds.arePattern(new bool[] { false, true, true }))
+
+                double[] values = _leds.ReadValues();
+                _red_led.Value = values[0];
+                _green_led.Value = values[1];
+                _yellow_led.Value = values[2];
+
+                if (_red_led.isOff)
+                    red_off_detected = true;
+                if (_green_led.isOn)
+                    green_on_detected = true;
+                if (_yellow_led.isOn)
+                    yellow_on_detected = true;
+
+                if(red_off_detected && green_on_detected && yellow_on_detected)
                 {
                     detected_count++;
+
+                    red_off_detected = false;
+                    green_on_detected = false;
+                    yellow_on_detected = false;
+
                     Thread.Sleep(500);
 
                     if (detected_count > 5)
                         break;
                 }
+
                 TimeSpan ts = DateTime.Now - start;
                 if (ts.TotalSeconds > 10)
                 {

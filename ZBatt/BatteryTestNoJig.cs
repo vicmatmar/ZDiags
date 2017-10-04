@@ -32,8 +32,6 @@ namespace ZBatt
 
         string _smt_serial;
 
-        bool _check_bat_voltage = false;
-
         public BatteryTestNoJig(string host, string smt_serial)
         {
             _host = host;
@@ -48,7 +46,7 @@ namespace ZBatt
             Console.ReadLine();
 
             fire_status("Connect POWER adaptor and check all LEDs blink.  Press Y if they do, N if not");
-            while(true)
+            while (true)
             {
                 char c = Console.ReadKey().KeyChar;
                 if (c == 'y' || c == 'Y')
@@ -72,84 +70,41 @@ namespace ZBatt
 
                 string cmd = "show battery";
                 string outputcheck = "Level:";
-
-                try
-                {
-                    data = ssh.WriteWait(cmd, outputcheck, 2);
-                    _check_bat_voltage = true;
-
-                }
-                catch(System.TimeoutException ex)
-                {
-                    _check_bat_voltage = false;
-                }
-
-                if (!_check_bat_voltage)
-                {
-                    outputcheck = "Battery Information is not available";
-                }
                 fire_status("Outputcheck: " + outputcheck);
-
-                if (_check_bat_voltage)
+                data = ssh.WriteWait(cmd, outputcheck, 3);
+                volts = parseVolatge(data);
+                msg = string.Format("Battery voltage before DUT power removed detected at {0}", volts);
+                fire_status(msg);
+                if (volts < 5.0)
                 {
-                    data = ssh.WriteWait(cmd, outputcheck, 3);
-                    volts = parseVolatge(data);
-                    msg = string.Format("Battery voltage before DUT power removed detected at {0}", volts);
-                    fire_status(msg);
-                    if (volts < 5.0)
-                    {
-                        msg = string.Format("Battery power before DUT power removed too low.  Detected at {0}", volts);
-                        throw new Exception(msg);
-                    }
-                }
-                else
-                {
-                    data = ssh.WriteWait(cmd, outputcheck, 3);
-                    fire_status(outputcheck);
+                    msg = string.Format("Battery power before DUT power removed too low.  Detected at {0}", volts);
+                    throw new Exception(msg);
                 }
 
                 fire_status("Remove the POWER adapter and press enter to continue.");
                 Console.ReadLine();
                 Thread.Sleep(3000);
-
-                if (_check_bat_voltage)
+                data = ssh.WriteWait(cmd, outputcheck, 3);
+                volts = parseVolatge(data);
+                msg = string.Format("Battery voltage after DUT power removed detected at {0}", volts);
+                fire_status(msg);
+                if (volts < 4.0)
                 {
-                    data = ssh.WriteWait(cmd, outputcheck, 3);
-                    volts = parseVolatge(data);
-                    msg = string.Format("Battery voltage after DUT power removed detected at {0}", volts);
-                    fire_status(msg);
-                    if (volts < 4.0)
-                    {
-                        msg = string.Format("Battery power after DUT power removed too low.  Detected at {0}", volts);
-                        throw new Exception(msg);
-                    }
+                    msg = string.Format("Battery power after DUT power removed too low.  Detected at {0}", volts);
+                    throw new Exception(msg);
                 }
-                else
-                {
-                    data = ssh.WriteWait(cmd, outputcheck, 3);
-                    fire_status(outputcheck);
-                }
-
 
                 fire_status("Reconnect the POWER adapter and press enter to continue");
                 Console.ReadLine();
 
-                if (_check_bat_voltage)
+                data = ssh.WriteWait(cmd, outputcheck, 3);
+                volts = parseVolatge(data);
+                msg = string.Format("Battery voltage after DUT power re-applied at {0}", volts);
+                fire_status(msg);
+                if (volts < 5.0)
                 {
-                    data = ssh.WriteWait(cmd, outputcheck, 3);
-                    volts = parseVolatge(data);
-                    msg = string.Format("Battery voltage after DUT power re-applied at {0}", volts);
-                    fire_status(msg);
-                    if (volts < 5.0)
-                    {
-                        msg = string.Format("Battery power after DUT power ed too low.  Detected at {0}", volts);
-                        throw new Exception(msg);
-                    }
-                }
-                else
-                {
-                    data = ssh.WriteWait(cmd, outputcheck, 3);
-                    fire_status(outputcheck);
+                    msg = string.Format("Battery power after DUT power ed too low.  Detected at {0}", volts);
+                    throw new Exception(msg);
                 }
 
                 SaveShowMfg(ssh);

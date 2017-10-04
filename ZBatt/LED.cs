@@ -69,15 +69,19 @@ namespace ZBatt
 
         public bool arePattern(bool[] pattern)
         {
+            return arePattern(ReadValues(), pattern);
+        }
+
+        public bool arePattern(double[] values, bool[] pattern)
+        {
             bool ispattern = true;
-            double[] values = ReadValues();
             for (int i = 0; i < values.Length; i++)
             {
                 ispattern &= (_leds[i].getIsOn(values[i]) == pattern[i]);
             }
             return ispattern;
-
         }
+
 
         public void ResetMaxValues()
         {

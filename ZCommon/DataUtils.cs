@@ -34,7 +34,15 @@ namespace ZCommon
             // Write ZPL String to connection
             System.IO.StreamWriter writer = new System.IO.StreamWriter(client.GetStream());
 
-            object[] data = new object[3] { hub_serial, hub_mac, hub_id };
+            string short_serial = hub_serial;
+            if (short_serial.StartsWith("CLT"))
+                short_serial = short_serial.Substring(3);
+            string barcode_serial = 
+                ">;" + 
+                short_serial.Substring(0, short_serial.Length-1) +
+                ">6" +
+                short_serial[short_serial.Length-1];
+            object[] data = new object[4] { short_serial, barcode_serial, hub_mac, hub_id };
 
             string label = string.Format(System.Text.Encoding.UTF8.GetString(zpl_file_bytes), data);
 

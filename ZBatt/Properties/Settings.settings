@@ -27,7 +27,7 @@
       <Value Profile="(Default)">zeus.zpl</Value>
     </Setting>
     <Setting Name="Printer_Address" Type="System.String" Scope="User">
-      <Value Profile="(Default)">172.29.250.59</Value>
+      <Value Profile="(Default)">172.19.3.36</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -121,7 +121,7 @@ namespace ZBatt.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("172.29.250.59")]
+        [global::System.Configuration.DefaultSettingValueAttribute("172.19.3.36")]
         public string Printer_Address {
             get {
                 return ((string)(this["Printer_Address"]));

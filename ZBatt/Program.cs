@@ -163,7 +163,8 @@ namespace ZBatt
             }
             finally
             {
-
+                if (!options.NoJigMode)
+                    BatteryJig.Set_all_relays(false);
             }
 
             _log.Info("All Tests Passed");
