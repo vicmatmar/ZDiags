@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZPrint", "ZPrint\ZPrint.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NIUtils", "NIUtils\NIUtils.csproj", "{C264218F-5D27-4393-A06F-AB2B329E0A02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WZDiags", "WZDiags\WZDiags.csproj", "{2CC66F7D-4DA1-47F1-A537-714AAA908893}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{C264218F-5D27-4393-A06F-AB2B329E0A02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C264218F-5D27-4393-A06F-AB2B329E0A02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C264218F-5D27-4393-A06F-AB2B329E0A02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CC66F7D-4DA1-47F1-A537-714AAA908893}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CC66F7D-4DA1-47F1-A537-714AAA908893}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CC66F7D-4DA1-47F1-A537-714AAA908893}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CC66F7D-4DA1-47F1-A537-714AAA908893}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

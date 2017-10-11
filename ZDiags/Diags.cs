@@ -12,7 +12,7 @@ using ZCommon;
 
 namespace ZDiags
 {
-    class Diags : IDisposable
+    public class Diags : IDisposable
     {
         enum Relays : uint { DUT = 0, BUTTON, BLE, USB2, USB1 };
         enum Sensors : uint { BUZZER_AUDIO = 0, GREEN_LIGHT, RED_LIGHT, YELLOW_LIGHT };
@@ -33,7 +33,7 @@ namespace ZDiags
 
         string _tester;
 
-        bool _program_radios = true;
+        bool _program_radios = false;
         public bool Program_Radios { get { return _program_radios; } set { _program_radios = value; } }
 
         int _program_radios_timeout_sec = 140;
