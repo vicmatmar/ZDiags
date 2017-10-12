@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,17 +15,9 @@ namespace WZDiags
 {
     public partial class Form_WZDiags : Form
     {
-        string _com_dut, _com_bt;
-
-        Diags.Customer _custumer;
-        int _hw_version;
-        string _tester;
 
         Diags _diags;
-
         Task _run_task;
-
-    
 
         public Form_WZDiags()
         {
@@ -33,28 +26,34 @@ namespace WZDiags
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Version version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+            this.Text = this.Text + " " + version.ToString();
+
             textBox_Serial.Text = "";
             textBox_RunStatus.Text = "Ready";
             textBox_OutputStatus.Text = "";
 
             button_Run.Enabled = true;
 
-            _com_dut = "com12";
-            _com_bt = "com11";
-            _hw_version = 3;
-            _tester = "Victor Martin";
         }
 
         private void button_Run_Click(object sender, EventArgs e)
         {
+            Diags.Customers costumer = (Diags.Customers)Enum.Parse(typeof(Diags.Customers), Properties.Settings.Default.Costumer);
+
             _diags = new Diags(
-                dut_port_name: _com_dut, ble_port_name: _com_bt,
+                dut_port_name: Properties.Settings.Default.COM_DUT, 
+                ble_port_name: Properties.Settings.Default.COM_BLE,
                 smt_serial: textBox_Serial.Text,
-                customer: _custumer,
-                hw_version: _hw_version,
-                tester: _tester,
+                customer: costumer,
+                hw_version: Properties.Settings.Default.HwVer,
+                tester: Properties.Settings.Default.Operator,
                 hub_ip_addr: null
             );
+
+            _diags.LogFolder = Properties.Settings.Default.Log_Folder;
+            Directory.CreateDirectory(_diags.LogFolder);
+
 
             _diags.Status_Event += _diags_Status_Event;
 
@@ -64,6 +63,16 @@ namespace WZDiags
             
 
             setRunning(true);
+
+            textBox_OutputStatus.Clear();
+            textBox_OutputStatus.AppendText("Parameters:\r\n");
+            textBox_OutputStatus.AppendText(string.Format("Operator: {0}\r\n", _diags.Tester));
+            textBox_OutputStatus.AppendText(string.Format("DUT COM: {0}\r\n", _diags.COM_DUT_Name));
+            textBox_OutputStatus.AppendText(string.Format("BT COM: {0}\r\n", _diags.COM_BT_Name));
+            textBox_OutputStatus.AppendText(string.Format("Customer: {0}\r\n", _diags.Costumer.ToString()));
+            textBox_OutputStatus.AppendText(string.Format("HW Ver: {0}\r\n", _diags.HW_Ver));
+            textBox_OutputStatus.AppendText("\r\n");
+
             this.timer_UpdateRunning.Start();
             _run_task.Start();
 
@@ -77,31 +86,33 @@ namespace WZDiags
 
         void runDone(Task task)
         {
-            if (_diags != null)
-                _diags.Dispose();
-
-            setRunning(false);
-
             syncControlSetTextAndColor(textBox_RunStatus, "PASS", Color.White, Color.Green);
+            syncControlAppendText(textBox_OutputStatus, "All Tests Passed for: " + textBox_Serial.Text + "\r\n");
 
-            this.timer_UpdateRunning.Stop();
-
+            runTearDown();
         }
 
         void runError(Task task)
+        {
+            syncControlAppendText(textBox_OutputStatus, "\r\n" + task.Exception.InnerException.Message + "\r\n");
+            syncControlAppendText(textBox_OutputStatus, task.Exception.InnerException.StackTrace + "\r\n");
+
+            syncControlSetTextAndColor(textBox_RunStatus, "FAIL", Color.White, Color.Red);
+            syncControlAppendText(textBox_OutputStatus, textBox_Serial.Text + " FAILED\r\n");
+
+            runTearDown();
+        }
+
+        void runTearDown()
         {
             if (_diags != null)
                 _diags.Dispose();
 
             setRunning(false);
 
-            syncControlAppendText(textBox_OutputStatus, task.Exception.InnerException.Message);
-            syncControlAppendText(textBox_OutputStatus, task.Exception.InnerException.StackTrace);
-
-            syncControlSetTextAndColor(textBox_RunStatus, "FAIL", Color.White, Color.Red);
+            syncControlSetTextAndColor(textBox_Serial, "", Color.Black, Color.White);
 
             this.timer_UpdateRunning.Stop();
-
         }
 
 
@@ -154,6 +165,12 @@ namespace WZDiags
                 if (textBox_RunStatus.Text.Length > 10)
                     textBox_RunStatus.Text = "Running";
             }
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Settings dlg = new Form_Settings();
+            dlg.Show();
         }
 
         void synchronizedInvoke(ISynchronizeInvoke sync, Action action)

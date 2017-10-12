@@ -17,21 +17,30 @@ namespace ZDiags
         enum Relays : uint { DUT = 0, BUTTON, BLE, USB2, USB1 };
         enum Sensors : uint { BUZZER_AUDIO = 0, GREEN_LIGHT, RED_LIGHT, YELLOW_LIGHT };
 
-        string _dutport_name, _bleport_name;
+        string _dutport_name;
+        public string COM_DUT_Name { get { return _dutport_name; } }
+        
+        string _bleport_name;
+        public string COM_BT_Name { get { return _bleport_name; } }
+
         SerialCOM _dutport, _bleport;
 
         string _smt_serial;
+        public string SMT_Serial { get { return _smt_serial; } }
 
         long _lowes_serial = 0;
         public long Lowes_Serial { get { return _lowes_serial; } }
 
-        public enum Customer { IRIS, Amazone };
-        Customer _custumer;
+        public enum Customers { IRIS, Amazone };
+        Customers _customer;
+        public Customers Costumer {  get { return _customer; } }
 
         string _serialize_model = "IH200";
         int _serialize_hw_version = 3;
+        public int HW_Ver { get { return _serialize_hw_version; } }
 
         string _tester;
+        public string Tester { get { return _tester; } }
 
         bool _program_radios = false;
         public bool Program_Radios { get { return _program_radios; } set { _program_radios = value; } }
@@ -61,13 +70,13 @@ namespace ZDiags
         bool _ble_test_disabled = false;
         public bool BLETestDisable { get { return _ble_test_disabled; } set { _ble_test_disabled = value; } }
 
-        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customer customer, int hw_version, string tester = "Victor Martin", string hub_ip_addr = null)
+        public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customers customer, int hw_version, string tester = "Victor Martin", string hub_ip_addr = null)
         {
             _dutport_name = dut_port_name;
             _bleport_name = ble_port_name;
 
             _smt_serial = smt_serial;
-            _custumer = customer;
+            _customer = customer;
             _serialize_hw_version = hw_version;
 
             _tester = tester;
@@ -512,7 +521,7 @@ namespace ZDiags
                 port.WriteLine();
                 port.WaitFor("#", 3);
 
-                int customer_id = cx.LowesCustomers.Where(c => c.Name == _custumer.ToString()).Single().Id;
+                int customer_id = cx.LowesCustomers.Where(c => c.Name == _customer.ToString()).Single().Id;
 
                 // See if this board already had a mac assigned
                 long mac = MACAddrUtils.INVALID_MAC;
@@ -539,7 +548,7 @@ namespace ZDiags
 
 
                 string cmd = string.Format("serialize {0} model {1} customer {2} hw_version {3} batch_no {4}",
-                    macstr, _serialize_model, _custumer.ToString(), _serialize_hw_version, Lowes_Serial);
+                    macstr, _serialize_model, _customer.ToString(), _serialize_hw_version, Lowes_Serial);
 
                 fire_status(cmd);
                 port.WriteLine(cmd);

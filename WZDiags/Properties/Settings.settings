@@ -1,7 +1,48 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WZDiags.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="COM_DUT" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="COM_BLE" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="MAC_Block_Start" Type="System.String" Scope="User">
+      <Value Profile="(Default)">97207484672</Value>
+    </Setting>
+    <Setting Name="MAC_Block_End" Type="System.String" Scope="User">
+      <Value Profile="(Default)">97207582463</Value>
+    </Setting>
+    <Setting Name="Log_Folder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LogDiags</Value>
+    </Setting>
+    <Setting Name="LED_Red_On_Val" Type="System.String" Scope="User">
+      <Value Profile="(Default)">4.5</Value>
+    </Setting>
+    <Setting Name="LED_Red_Off_Val" Type="System.String" Scope="User">
+      <Value Profile="(Default)">3.0</Value>
+    </Setting>
+    <Setting Name="LED_Yellow_On_Val" Type="System.String" Scope="User">
+      <Value Profile="(Default)">3.9</Value>
+    </Setting>
+    <Setting Name="LED_Yellow_Off_Val" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0.3</Value>
+    </Setting>
+    <Setting Name="LED_Green_On_Val" Type="System.String" Scope="User">
+      <Value Profile="(Default)">2.79</Value>
+    </Setting>
+    <Setting Name="LED_Green_Off_Val" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0.6</Value>
+    </Setting>
+    <Setting Name="Operator" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Victor Martin</Value>
+    </Setting>
+    <Setting Name="HwVer" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="Costumer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">IRIS</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

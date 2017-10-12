@@ -57,9 +57,9 @@ namespace ZDiags
             string com_ble = valuestr;
 
             Console.WriteLine("SMT Serial: " + options.SMT_Serial);
-            Diags.Customer customer = Diags.Customer.IRIS; ;
+            Diags.Customers customer = Diags.Customers.IRIS; ;
             if (options.Custumer_Amazone)
-                customer = Diags.Customer.Amazone;
+                customer = Diags.Customers.Amazone;
             Console.WriteLine("Custumer: " + customer.ToString());
             Console.WriteLine("HW Version: " + options.HW_Version);
 

@@ -8,22 +8,186 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WZDiags.Properties
-{
-
-
+namespace WZDiags.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string COM_DUT {
+            get {
+                return ((string)(this["COM_DUT"]));
+            }
+            set {
+                this["COM_DUT"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string COM_BLE {
+            get {
+                return ((string)(this["COM_BLE"]));
+            }
+            set {
+                this["COM_BLE"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("97207484672")]
+        public string MAC_Block_Start {
+            get {
+                return ((string)(this["MAC_Block_Start"]));
+            }
+            set {
+                this["MAC_Block_Start"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("97207582463")]
+        public string MAC_Block_End {
+            get {
+                return ((string)(this["MAC_Block_End"]));
+            }
+            set {
+                this["MAC_Block_End"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LogDiags")]
+        public string Log_Folder {
+            get {
+                return ((string)(this["Log_Folder"]));
+            }
+            set {
+                this["Log_Folder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
+        public string LED_Red_On_Val {
+            get {
+                return ((string)(this["LED_Red_On_Val"]));
+            }
+            set {
+                this["LED_Red_On_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.0")]
+        public string LED_Red_Off_Val {
+            get {
+                return ((string)(this["LED_Red_Off_Val"]));
+            }
+            set {
+                this["LED_Red_Off_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.9")]
+        public string LED_Yellow_On_Val {
+            get {
+                return ((string)(this["LED_Yellow_On_Val"]));
+            }
+            set {
+                this["LED_Yellow_On_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.3")]
+        public string LED_Yellow_Off_Val {
+            get {
+                return ((string)(this["LED_Yellow_Off_Val"]));
+            }
+            set {
+                this["LED_Yellow_Off_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.79")]
+        public string LED_Green_On_Val {
+            get {
+                return ((string)(this["LED_Green_On_Val"]));
+            }
+            set {
+                this["LED_Green_On_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        public string LED_Green_Off_Val {
+            get {
+                return ((string)(this["LED_Green_Off_Val"]));
+            }
+            set {
+                this["LED_Green_Off_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Victor Martin")]
+        public string Operator {
+            get {
+                return ((string)(this["Operator"]));
+            }
+            set {
+                this["Operator"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int HwVer {
+            get {
+                return ((int)(this["HwVer"]));
+            }
+            set {
+                this["HwVer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("IRIS")]
+        public string Costumer {
+            get {
+                return ((string)(this["Costumer"]));
+            }
+            set {
+                this["Costumer"] = value;
             }
         }
     }
