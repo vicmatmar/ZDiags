@@ -17,22 +17,22 @@
     <Setting Name="Log_Folder" Type="System.String" Scope="User">
       <Value Profile="(Default)">LogDiags</Value>
     </Setting>
-    <Setting Name="LED_Red_On_Val" Type="System.String" Scope="User">
+    <Setting Name="LED_Red_On_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">4.5</Value>
     </Setting>
-    <Setting Name="LED_Red_Off_Val" Type="System.String" Scope="User">
-      <Value Profile="(Default)">3.0</Value>
+    <Setting Name="LED_Red_Off_Val" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="LED_Yellow_On_Val" Type="System.String" Scope="User">
+    <Setting Name="LED_Yellow_On_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">3.9</Value>
     </Setting>
-    <Setting Name="LED_Yellow_Off_Val" Type="System.String" Scope="User">
+    <Setting Name="LED_Yellow_Off_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.3</Value>
     </Setting>
-    <Setting Name="LED_Green_On_Val" Type="System.String" Scope="User">
+    <Setting Name="LED_Green_On_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">2.79</Value>
     </Setting>
-    <Setting Name="LED_Green_Off_Val" Type="System.String" Scope="User">
+    <Setting Name="LED_Green_Off_Val" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.6</Value>
     </Setting>
     <Setting Name="Operator" Type="System.String" Scope="User">

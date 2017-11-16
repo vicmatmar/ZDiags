@@ -86,9 +86,9 @@ namespace WZDiags.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
-        public string LED_Red_On_Val {
+        public double LED_Red_On_Val {
             get {
-                return ((string)(this["LED_Red_On_Val"]));
+                return ((double)(this["LED_Red_On_Val"]));
             }
             set {
                 this["LED_Red_On_Val"] = value;
@@ -97,10 +97,10 @@ namespace WZDiags.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.0")]
-        public string LED_Red_Off_Val {
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public double LED_Red_Off_Val {
             get {
-                return ((string)(this["LED_Red_Off_Val"]));
+                return ((double)(this["LED_Red_Off_Val"]));
             }
             set {
                 this["LED_Red_Off_Val"] = value;
@@ -110,9 +110,9 @@ namespace WZDiags.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("3.9")]
-        public string LED_Yellow_On_Val {
+        public double LED_Yellow_On_Val {
             get {
-                return ((string)(this["LED_Yellow_On_Val"]));
+                return ((double)(this["LED_Yellow_On_Val"]));
             }
             set {
                 this["LED_Yellow_On_Val"] = value;
@@ -122,9 +122,9 @@ namespace WZDiags.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0.3")]
-        public string LED_Yellow_Off_Val {
+        public double LED_Yellow_Off_Val {
             get {
-                return ((string)(this["LED_Yellow_Off_Val"]));
+                return ((double)(this["LED_Yellow_Off_Val"]));
             }
             set {
                 this["LED_Yellow_Off_Val"] = value;
@@ -134,9 +134,9 @@ namespace WZDiags.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2.79")]
-        public string LED_Green_On_Val {
+        public double LED_Green_On_Val {
             get {
-                return ((string)(this["LED_Green_On_Val"]));
+                return ((double)(this["LED_Green_On_Val"]));
             }
             set {
                 this["LED_Green_On_Val"] = value;
@@ -146,9 +146,9 @@ namespace WZDiags.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
-        public string LED_Green_Off_Val {
+        public double LED_Green_Off_Val {
             get {
-                return ((string)(this["LED_Green_Off_Val"]));
+                return ((double)(this["LED_Green_Off_Val"]));
             }
             set {
                 this["LED_Green_Off_Val"] = value;

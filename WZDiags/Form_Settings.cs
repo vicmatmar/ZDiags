@@ -29,8 +29,15 @@ namespace WZDiags
             Properties.Settings.Default.HwVer = Convert.ToInt32(numericUpDown_HWVer.Value);
             Properties.Settings.Default.Costumer = domainUpDown_Customer.Text;
 
-            Properties.Settings.Default.Save();
+            // LEDs
+            Properties.Settings.Default.LED_Red_Off_Val = (double)Red_min_numericUpDown.Value;
+            Properties.Settings.Default.LED_Red_On_Val = (double)Red_max_numericUpDown.Value;
+            Properties.Settings.Default.LED_Green_Off_Val = (double)Green_min_numericUpDown.Value;
+            Properties.Settings.Default.LED_Green_On_Val = (double)Green_max_numericUpDown.Value;
+            Properties.Settings.Default.LED_Yellow_Off_Val = (double)Yellow_min_numericUpDown.Value;
+            Properties.Settings.Default.LED_Yellow_On_Val = (double)Yellow_max_numericUpDown.Value;
 
+            Properties.Settings.Default.Save();
 
             Close();
         }
@@ -51,6 +58,15 @@ namespace WZDiags
 
             domainUpDown_Customer.Items.Clear();
             domainUpDown_Customer.Items.AddRange(Enum.GetNames(typeof(ZDiags.Diags.Customers)));
+
+            // LEDs
+            Red_min_numericUpDown.Value = (decimal)Properties.Settings.Default.LED_Red_Off_Val;
+            Red_max_numericUpDown.Value = (decimal)Properties.Settings.Default.LED_Red_On_Val;
+            Green_min_numericUpDown.Value = (decimal)Properties.Settings.Default.LED_Green_Off_Val;
+            Green_max_numericUpDown.Value = (decimal)Properties.Settings.Default.LED_Green_On_Val;
+            Yellow_min_numericUpDown.Value = (decimal)Properties.Settings.Default.LED_Yellow_Off_Val;
+            Yellow_max_numericUpDown.Value = (decimal)Properties.Settings.Default.LED_Yellow_On_Val;
+
 
         }
 

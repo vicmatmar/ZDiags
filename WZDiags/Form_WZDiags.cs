@@ -24,7 +24,7 @@ namespace WZDiags
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Form_Load(object sender, EventArgs e)
         {
             Version version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             this.Text = this.Text + " " + version.ToString();
@@ -50,12 +50,17 @@ namespace WZDiags
                 tester: Properties.Settings.Default.Operator,
                 hub_ip_addr: null
             );
+            _diags.Status_Event += _diags_Status_Event;
 
             _diags.LogFolder = Properties.Settings.Default.Log_Folder;
             Directory.CreateDirectory(_diags.LogFolder);
 
-
-            _diags.Status_Event += _diags_Status_Event;
+            _diags.LED_Red_Low_Value = Properties.Settings.Default.LED_Red_Off_Val;
+            _diags.LED_Red_High_Value = Properties.Settings.Default.LED_Red_On_Val;
+            _diags.LED_Green_Low_Value = Properties.Settings.Default.LED_Green_Off_Val;
+            _diags.LED_Green_High_Value = Properties.Settings.Default.LED_Green_On_Val;
+            _diags.LED_Yellow_Low_Value = Properties.Settings.Default.LED_Yellow_Off_Val;
+            _diags.LED_Yellow_High_Value = Properties.Settings.Default.LED_Yellow_On_Val;
 
             _run_task = new Task(() => _diags.Run());
             _run_task.ContinueWith(runDone, TaskContinuationOptions.OnlyOnRanToCompletion);

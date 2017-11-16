@@ -19,7 +19,7 @@ namespace ZDiags
 
         string _dutport_name;
         public string COM_DUT_Name { get { return _dutport_name; } }
-        
+
         string _bleport_name;
         public string COM_BT_Name { get { return _bleport_name; } }
 
@@ -33,7 +33,7 @@ namespace ZDiags
 
         public enum Customers { IRIS, Amazone };
         Customers _customer;
-        public Customers Costumer {  get { return _customer; } }
+        public Customers Costumer { get { return _customer; } }
 
         string _serialize_model = "IH200";
         int _serialize_hw_version = 3;
@@ -70,6 +70,13 @@ namespace ZDiags
         bool _ble_test_disabled = false;
         public bool BLETestDisable { get { return _ble_test_disabled; } set { _ble_test_disabled = value; } }
 
+        public double LED_Red_Low_Value { get; set; }
+        public double LED_Red_High_Value { get; set; }
+        public double LED_Green_Low_Value { get; set; }
+        public double LED_Green_High_Value { get; set; }
+        public double LED_Yellow_Low_Value { get; set; }
+        public double LED_Yellow_High_Value { get; set; }
+
         public Diags(string dut_port_name, string ble_port_name, string smt_serial, Customers customer, int hw_version, string tester = "Victor Martin", string hub_ip_addr = null)
         {
             _dutport_name = dut_port_name;
@@ -85,6 +92,13 @@ namespace ZDiags
 
             MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Block_Start;
             MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Block_End;
+
+            LED_Red_Low_Value = Properties.Settings.Default.LED_Red_Off_Val;
+            LED_Red_High_Value = Properties.Settings.Default.LED_Red_On_Val;
+            LED_Green_Low_Value = Properties.Settings.Default.LED_Green_Off_Val;
+            LED_Green_High_Value = Properties.Settings.Default.LED_Green_On_Val;
+            LED_Yellow_Low_Value = Properties.Settings.Default.LED_Yellow_Off_Val;
+            LED_Yellow_High_Value = Properties.Settings.Default.LED_Yellow_On_Val;
 
         }
 
@@ -264,7 +278,8 @@ namespace ZDiags
                 // Make sure we can talk to hub
                 dutport.WriteWait("", "#", 3);
 
-                dutport.WriteWait("certificate " + _certificate_server + " skip_ca_check true", "Key install was successful", 15);
+                dutport.WriteWait("certificate " + _certificate_server + " skip_ca_check true", "Key install was successful", 5);
+
                 fire_status("Key install was successful");
             }
         }
@@ -438,10 +453,9 @@ namespace ZDiags
 
 
                 fire_status("LED Tests");
-                var p = Properties.Settings.Default;
-                led_test(Sensors.GREEN_LIGHT, p.LED_Green_Off_Val, p.LED_Green_On_Val, "green");
-                led_test(Sensors.RED_LIGHT, p.LED_Red_Off_Val, p.LED_Red_On_Val, "red");
-                led_test(Sensors.YELLOW_LIGHT, p.LED_Yellow_Off_Val, p.LED_Yellow_On_Val, "yellow");
+                led_test(Sensors.RED_LIGHT, LED_Red_Low_Value, LED_Red_High_Value, "red");
+                led_test(Sensors.GREEN_LIGHT, LED_Green_Low_Value, LED_Green_High_Value, "green");
+                led_test(Sensors.YELLOW_LIGHT, LED_Yellow_Low_Value, LED_Yellow_High_Value, "yellow");
 
                 // Other tests
                 fire_status("Other Built-in Tests...");

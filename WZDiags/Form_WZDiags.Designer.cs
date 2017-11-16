@@ -147,7 +147,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form_WZDiags";
             this.Text = "WZDiags";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.Form_Load);
             this.menuStrip2.ResumeLayout(false);
             this.menuStrip2.PerformLayout();
             this.ResumeLayout(false);
