@@ -44,7 +44,7 @@ namespace WZDiags
             _diags = new Diags(
                 dut_port_name: Properties.Settings.Default.COM_DUT, 
                 ble_port_name: Properties.Settings.Default.COM_BLE,
-                smt_serial: textBox_Serial.Text,
+                smt_serial: textBox_Serial.Text.ToUpper(),
                 customer: costumer,
                 hw_version: Properties.Settings.Default.HwVer,
                 tester: Properties.Settings.Default.Operator,
@@ -202,5 +202,9 @@ namespace WZDiags
             }
         }
 
+        private void textBox_Serial_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

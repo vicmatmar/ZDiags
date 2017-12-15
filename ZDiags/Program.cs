@@ -56,6 +56,8 @@ namespace ZDiags
             Console.WriteLine(propname.ToUpper() + ": " + valuestr);
             string com_ble = valuestr;
 
+            // Don't allow lower case serials
+            options.SMT_Serial = options.SMT_Serial.ToUpper();
             Console.WriteLine("SMT Serial: " + options.SMT_Serial);
             Diags.Customers customer = Diags.Customers.IRIS; ;
             if (options.Custumer_Amazone)

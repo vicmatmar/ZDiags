@@ -85,6 +85,7 @@
             // 
             this.textBox_Serial.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_Serial.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textBox_Serial.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_Serial.Location = new System.Drawing.Point(71, 24);
             this.textBox_Serial.Name = "textBox_Serial";

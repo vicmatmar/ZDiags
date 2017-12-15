@@ -73,6 +73,8 @@ namespace ZBatt
                 return -1;
             }
 
+            // Don't allow lower case serial
+            options.SMT_Serial = options.SMT_Serial.ToUpper();
             Console.WriteLine("SMT Serial: " + options.SMT_Serial);
             Console.WriteLine("Host: " + options.Host);
             Console.WriteLine();

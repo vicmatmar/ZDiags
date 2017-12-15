@@ -82,7 +82,7 @@ namespace ZDiags
             _dutport_name = dut_port_name;
             _bleport_name = ble_port_name;
 
-            _smt_serial = smt_serial;
+            _smt_serial = smt_serial.ToUpper();
             _customer = customer;
             _serialize_hw_version = hw_version;
 
@@ -453,8 +453,8 @@ namespace ZDiags
 
 
                 fire_status("LED Tests");
-                led_test(Sensors.RED_LIGHT, LED_Red_Low_Value, LED_Red_High_Value, "red");
                 led_test(Sensors.GREEN_LIGHT, LED_Green_Low_Value, LED_Green_High_Value, "green");
+                led_test(Sensors.RED_LIGHT, LED_Red_Low_Value, LED_Red_High_Value, "red");
                 led_test(Sensors.YELLOW_LIGHT, LED_Yellow_Low_Value, LED_Yellow_High_Value, "yellow");
 
                 // Other tests
@@ -584,7 +584,7 @@ namespace ZDiags
                 // Insert the hub
                 loweshub_data.customer_id = customer_id;
                 loweshub_data.mac_id = mac_id;
-                loweshub_data.smt_serial = _smt_serial.ToString();
+                loweshub_data.smt_serial = _smt_serial.ToString().ToUpper();
                 loweshub_data.lowes_serial = Lowes_Serial;
                 loweshub_data.hub_id = hubid;
 
