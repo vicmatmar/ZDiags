@@ -8,10 +8,10 @@
     <Setting Name="COM_BLE" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="MAC_Block_Start" Type="System.String" Scope="User">
+    <Setting Name="MAC_Lowes_Block_Start" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">97207484672</Value>
     </Setting>
-    <Setting Name="MAC_Block_End" Type="System.String" Scope="User">
+    <Setting Name="MAC_Lowes_Block_End" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">97207582463</Value>
     </Setting>
     <Setting Name="Log_Folder" Type="System.String" Scope="User">
@@ -43,6 +43,12 @@
     </Setting>
     <Setting Name="Costumer" Type="System.String" Scope="User">
       <Value Profile="(Default)">IRIS</Value>
+    </Setting>
+    <Setting Name="MAC_Centralite_Block_Start" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">97207582464</Value>
+    </Setting>
+    <Setting Name="MAC_Centralite_Block_End" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">97207647999</Value>
     </Setting>
   </Settings>
 </SettingsFile>

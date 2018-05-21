@@ -74,7 +74,7 @@ namespace WZDiags
             textBox_OutputStatus.AppendText(string.Format("Operator: {0}\r\n", _diags.Tester));
             textBox_OutputStatus.AppendText(string.Format("DUT COM: {0}\r\n", _diags.COM_DUT_Name));
             textBox_OutputStatus.AppendText(string.Format("BT COM: {0}\r\n", _diags.COM_BT_Name));
-            textBox_OutputStatus.AppendText(string.Format("Customer: {0}\r\n", _diags.Costumer.ToString()));
+            textBox_OutputStatus.AppendText(string.Format("Customer: {0}\r\n", _diags.Customer.ToString()));
             textBox_OutputStatus.AppendText(string.Format("HW Ver: {0}\r\n", _diags.HW_Ver));
             textBox_OutputStatus.AppendText("\r\n");
 

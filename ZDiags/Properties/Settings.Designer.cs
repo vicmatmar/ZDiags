@@ -12,7 +12,7 @@ namespace ZDiags.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -50,24 +50,24 @@ namespace ZDiags.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("97207484672")]
-        public long MAC_Block_Start {
+        public long MAC_Lowes_Block_Start {
             get {
-                return ((long)(this["MAC_Block_Start"]));
+                return ((long)(this["MAC_Lowes_Block_Start"]));
             }
             set {
-                this["MAC_Block_Start"] = value;
+                this["MAC_Lowes_Block_Start"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("97207582463")]
-        public long MAC_Block_End {
+        public long MAC_Lowes_Block_End {
             get {
-                return ((long)(this["MAC_Block_End"]));
+                return ((long)(this["MAC_Lowes_Block_End"]));
             }
             set {
-                this["MAC_Block_End"] = value;
+                this["MAC_Lowes_Block_End"] = value;
             }
         }
         
@@ -152,6 +152,30 @@ namespace ZDiags.Properties {
             }
             set {
                 this["LED_Green_Off_Val"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("97207582464")]
+        public long MAC_Centralite_Block_Start {
+            get {
+                return ((long)(this["MAC_Centralite_Block_Start"]));
+            }
+            set {
+                this["MAC_Centralite_Block_Start"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("97207647999")]
+        public long MAC_Centralite_Block_End {
+            get {
+                return ((long)(this["MAC_Centralite_Block_End"]));
+            }
+            set {
+                this["MAC_Centralite_Block_End"] = value;
             }
         }
     }

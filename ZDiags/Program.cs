@@ -62,7 +62,7 @@ namespace ZDiags
             Diags.Customers customer = Diags.Customers.IRIS; ;
             if (options.Custumer_Amazone)
                 customer = Diags.Customers.Amazone;
-            Console.WriteLine("Custumer: " + customer.ToString());
+            Console.WriteLine("Costumer: " + customer.ToString());
             Console.WriteLine("HW Version: " + options.HW_Version);
 
             string tester = DataUtils.OperatorName(options.Tester);

@@ -31,11 +31,13 @@ namespace ZDiags
         long _lowes_serial = 0;
         public long Lowes_Serial { get { return _lowes_serial; } }
 
-        public enum Customers { IRIS, Amazone };
+        public enum Customers { IRIS, Amazone, Centralite };
         Customers _customer;
-        public Customers Costumer { get { return _customer; } }
+        public Customers Customer { get { return _customer; } }
 
         string _serialize_model = "IH200";
+        public string Serialize_Model { get { return _serialize_model; } }
+
         int _serialize_hw_version = 3;
         public int HW_Ver { get { return _serialize_hw_version; } }
 
@@ -90,8 +92,16 @@ namespace ZDiags
 
             _hub_ip = hub_ip_addr;
 
-            MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Block_Start;
-            MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Block_End;
+            if (Customer == Customers.Centralite)
+            {
+                MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Centralite_Block_Start;
+                MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Centralite_Block_End;
+            }
+            else if (Customer == Customers.Amazone || Customer == Customers.IRIS)
+            {
+                MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Lowes_Block_Start;
+                MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Lowes_Block_End;
+            }
 
             LED_Red_Low_Value = Properties.Settings.Default.LED_Red_Off_Val;
             LED_Red_High_Value = Properties.Settings.Default.LED_Red_On_Val;
@@ -123,12 +133,12 @@ namespace ZDiags
             using (SerialCOM dutport = getDUTPort())
             using (SerialCOM bleport = getBLEPort())
             {
-                // Trun BLE board so 
+                // Turn BLE board so 
                 fire_status("Power up BLE master");
                 write_SingleDIO(Relays.BLE, true);
                 bleport.WaitFor("U-Boot", 3);
 
-                // Trun DUT on
+                // Turn DUT on
                 fire_status("Power up DUT");
                 write_SingleDIO(Relays.DUT, true);
                 dutport.WaitFor("U-Boot", 3);
@@ -258,7 +268,7 @@ namespace ZDiags
 
                 fire_status(mfg_data);
 
-                string fileloc = Path.Combine(this.LogFolder, "d" + _smt_serial.ToString() + ".txt");
+                string fileloc = Path.Combine(this.LogFolder, "d" + SMT_Serial.ToString() + ".txt");
                 using (FileStream fs = new FileStream(fileloc, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
@@ -501,6 +511,10 @@ namespace ZDiags
             using (CLStoreEntities cx = new CLStoreEntities())
             using (SerialCOM port = getDUTPort())
             {
+                // Make sure we can talk to hub
+                port.WriteLine();
+                port.WaitFor("#", 3);
+
                 LowesHub loweshub_data = new LowesHub();
 
                 // Gather info to serialize hub
@@ -513,8 +527,8 @@ namespace ZDiags
                 while (test_station_id > byte.MaxValue)
                     test_station_id = test_station_id >> 1;
 
-                int hw_ver = _serialize_hw_version;
-                loweshub_data.hw_ver = _serialize_hw_version;
+                int hw_ver = HW_Ver;
+                loweshub_data.hw_ver = HW_Ver;
                 while (hw_ver > byte.MaxValue)
                     hw_ver = hw_ver >> 1;
 
@@ -531,15 +545,11 @@ namespace ZDiags
                         test_station: (byte)test_station_id,
                         tester: (short)operator_id);
 
-                // Make sure we can talk to hub
-                port.WriteLine();
-                port.WaitFor("#", 3);
-
-                int customer_id = cx.LowesCustomers.Where(c => c.Name == _customer.ToString()).Single().Id;
+                int customer_id = cx.LowesCustomers.Where(c => c.Name == Customer.ToString()).Single().Id;
 
                 // See if this board already had a mac assigned
                 long mac = MACAddrUtils.INVALID_MAC;
-                var hubsq = cx.LowesHubs.Where(h => h.smt_serial == _smt_serial).OrderByDescending(h => h.date);
+                var hubsq = cx.LowesHubs.Where(h => h.smt_serial == SMT_Serial).OrderByDescending(h => h.date);
                 if (hubsq.Any())
                 {
                     var hubs = hubsq.ToArray();
@@ -562,7 +572,7 @@ namespace ZDiags
 
 
                 string cmd = string.Format("serialize {0} model {1} customer {2} hw_version {3} batch_no {4}",
-                    macstr, _serialize_model, _customer.ToString(), _serialize_hw_version, Lowes_Serial);
+                    macstr, Serialize_Model, Customer.ToString(), HW_Ver, Lowes_Serial);
 
                 fire_status(cmd);
                 port.WriteLine(cmd);
@@ -584,7 +594,7 @@ namespace ZDiags
                 // Insert the hub
                 loweshub_data.customer_id = customer_id;
                 loweshub_data.mac_id = mac_id;
-                loweshub_data.smt_serial = _smt_serial.ToString().ToUpper();
+                loweshub_data.smt_serial = SMT_Serial.ToString().ToUpper();
                 loweshub_data.lowes_serial = Lowes_Serial;
                 loweshub_data.hub_id = hubid;
 
@@ -609,13 +619,13 @@ namespace ZDiags
                 }
                 catch (Exception ex)
                 {
-                    if (trycount++ > 3)
+                    if (trycount++ > 5)
                         throw;
                 }
             }
 
             fire_status("Login");
-            port.WriteWait("root", "IRIS MFG Shell.*#", 5, isRegx: true);
+            port.WriteWait("root", "IRIS MFG Shell.*#", 10, isRegx: true);
 
         }
 
@@ -645,7 +655,7 @@ namespace ZDiags
             else
             {
                 _dutport.WriteLine("n");
-                string emsg = string.Format("Unable to detect {0} led. Volatgae was: {1}", color, val.ToString("f2"));
+                string emsg = string.Format("Unable to detect {0} led. Voltage was: {1}", color, val.ToString("f2"));
                 throw new Exception(emsg);
             }
 
@@ -734,7 +744,6 @@ namespace ZDiags
                 _fs_ble_data.Dispose();
                 _fs_ble_data = null;
             }
-
         }
     }
 }

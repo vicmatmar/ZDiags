@@ -80,6 +80,23 @@ namespace ZBatt
             Console.WriteLine();
 
 
+            // Check board was passed diags
+            try
+            {
+                using (CLStoreEntities cx = new CLStoreEntities())
+                {
+                    LowesHub h = cx.LowesHubs.Where(lh => lh.smt_serial == options.SMT_Serial).OrderByDescending(lh => lh.date).First();
+                    string info = string.Format("Hub {0} last diags {1}", h.MacAddress.MAC.ToString("X"), h.date.ToString());
+                    _log.Info(info);
+                }
+            }
+            catch(Exception ex)
+            {
+                _log.Fatal("Problem retrieving Hub diag info\r\n\r\n" + ex.Message + "\r\n" + ex.StackTrace);
+                return -3;
+            }
+
+
             if (options.CalibrateLEDs)
             {
 

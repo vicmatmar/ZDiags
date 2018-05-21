@@ -27,12 +27,19 @@ namespace ZDiags
             HelpText = "SMT Serial")]
         public string SMT_Serial { get; set; }
 
+        #region Customer
         [Option("customer_IRIS", Required = false, MutuallyExclusiveSet ="customer",
-            HelpText = "Specifies IRIS as custumer")]
+            HelpText = "Specifies IRIS as customer")]
         public bool Custumer_IRIS { get; set; }
-        [Option("customer_Amazone", Required = false, MutuallyExclusiveSet = "customer",
-            HelpText = "Specifies Amazone as custumer")]
+
+        [Option("customer_Amazon", Required = false, MutuallyExclusiveSet = "customer",
+            HelpText = "Specifies Amazon as customer")]
+        public bool Custumer_Centralite { get; set; }
+
+        [Option("customer_Centralite", Required = false, MutuallyExclusiveSet = "customer",
+            HelpText = "Specifies Centralite as customer")]
         public bool Custumer_Amazone { get; set; }
+        #endregion
 
         [Option("hw_version", Required = true,
             HelpText = "Board version")]
