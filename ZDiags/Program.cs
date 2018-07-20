@@ -59,9 +59,11 @@ namespace ZDiags
             // Don't allow lower case serials
             options.SMT_Serial = options.SMT_Serial.ToUpper();
             Console.WriteLine("SMT Serial: " + options.SMT_Serial);
-            Diags.Customers customer = Diags.Customers.IRIS; ;
-            if (options.Custumer_Amazone)
-                customer = Diags.Customers.Amazone;
+            Diags.Customers customer = Diags.Customers.IRIS;
+            if (options.Customer_Amazon)
+                customer = Diags.Customers.Amazon;
+            else if (options.Customer_Centralite)
+                customer = Diags.Customers.Centralite;
             Console.WriteLine("Costumer: " + customer.ToString());
             Console.WriteLine("HW Version: " + options.HW_Version);
 

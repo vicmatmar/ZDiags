@@ -31,7 +31,7 @@ namespace ZDiags
         long _lowes_serial = 0;
         public long Lowes_Serial { get { return _lowes_serial; } }
 
-        public enum Customers { IRIS, Amazone, Centralite };
+        public enum Customers { IRIS, Amazon, Centralite };
         Customers _customer;
         public Customers Customer { get { return _customer; } }
 
@@ -97,7 +97,7 @@ namespace ZDiags
                 MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Centralite_Block_Start;
                 MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Centralite_Block_End;
             }
-            else if (Customer == Customers.Amazone || Customer == Customers.IRIS)
+            else if (Customer == Customers.Amazon || Customer == Customers.IRIS)
             {
                 MACAddrUtils.BlockStartAddr = Properties.Settings.Default.MAC_Lowes_Block_Start;
                 MACAddrUtils.BlockEndAddr = Properties.Settings.Default.MAC_Lowes_Block_End;

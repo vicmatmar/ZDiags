@@ -30,16 +30,16 @@ namespace ZDiags
         #region Customer
         [Option("customer_IRIS", Required = false, MutuallyExclusiveSet ="customer",
             HelpText = "Specifies IRIS as customer")]
-        public bool Custumer_IRIS { get; set; }
+        public bool Customer_IRIS { get; set; }
 
         [Option("customer_Amazon", Required = false, MutuallyExclusiveSet = "customer",
-            HelpText = "Specifies Amazon as customer")]
-        public bool Custumer_Centralite { get; set; }
+            HelpText = "Specifies Centralite as customer")]
+        public bool Customer_Amazon { get; set; }
+        #endregion
 
         [Option("customer_Centralite", Required = false, MutuallyExclusiveSet = "customer",
-            HelpText = "Specifies Centralite as customer")]
-        public bool Custumer_Amazone { get; set; }
-        #endregion
+            HelpText = "Specifies Amazon as customer")]
+        public bool Customer_Centralite { get; set; }
 
         [Option("hw_version", Required = true,
             HelpText = "Board version")]
